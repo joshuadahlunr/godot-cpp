@@ -221,6 +221,78 @@ namespace Math {
 // Functions reproduced as in Godot's source code `math_funcs.h`.
 // Some are overloads to automatically support changing real_t into either double or float in the way Godot does.
 
+inline double deg_to_rad(double p_y) {
+	return p_y * Math_PI / 180.0;
+}
+inline float deg_to_rad(float p_y) {
+	return p_y * static_cast<float>(Math_PI) / 180.f;
+}
+
+inline double rad_to_deg(double p_y) {
+	return p_y * 180.0 / Math_PI;
+}
+inline float rad_to_deg(float p_y) {
+	return p_y * 180.f / static_cast<float>(Math_PI);
+}
+
+class Degree;
+
+/**
+ * Radian type (allows automatic worry free conversion between radians and degrees)
+ */
+class Radian {
+	real_t value;
+public:
+	Radian(const real_t radian) : value(radian) {}
+	Radian(const Radian& other) : Radian(other.value) {}
+	Radian() : Radian(0) {}
+	Radian(const Degree d); 
+
+	Radian& operator=(const Radian& other) = default;
+
+	operator real_t() const { return value; }
+
+	// Radian operator+(const Radian other) const { return Radian{value + other.value}; }
+	// Radian operator-(const Radian other) const { return Radian{value - other.value}; }
+	// Radian operator*(const Radian other) const { return Radian{value * other.value}; }
+	// Radian operator/(const Radian other) const { return Radian{value / other.value}; }
+
+	Radian& operator+=(const Radian other) { *this = *this + other; return *this; }
+	Radian& operator-=(const Radian other) { *this = *this - other; return *this; }
+	Radian& operator*=(const Radian other) { *this = *this * other; return *this; }
+	Radian& operator/=(const Radian other) { *this = *this / other; return *this; }
+};
+
+/**
+ * Degree type (allows automatic worry free conversion between radians and degrees)
+ */
+class Degree {
+	real_t value;
+public:
+	Degree(real_t degree) : value(degree) {}
+	Degree(const Degree& other) : Degree(other.value) {}
+	Degree() : Degree(0) {}
+	Degree(const Radian r) : Degree(Math::rad_to_deg(real_t(r))) {}
+
+	Degree& operator=(const Degree& other) = default;
+
+	operator real_t() const { return value; }
+
+	// Degree operator+(const Degree other) const { return Degree{value + other.value}; }
+	// Degree operator-(const Degree other) const { return Degree{value - other.value}; }
+	// Degree operator*(const Degree other) const { return Degree{value * other.value}; }
+	// Degree operator/(const Degree other) const { return Degree{value / other.value}; }
+
+	Degree& operator+=(const Degree other) { *this = *this + other; return *this; }
+	Degree& operator-=(const Degree other) { *this = *this - other; return *this; }
+	Degree& operator*=(const Degree other) { *this = *this * other; return *this; }
+	Degree& operator/=(const Degree other) { *this = *this / other; return *this; }
+
+	real_t RadianValue() { return Radian(*this); }
+};
+
+inline Radian::Radian(const Degree d) : Radian(Math::deg_to_rad(real_t(d))) {}
+
 inline double fmod(double p_x, double p_y) {
 	return ::fmod(p_x, p_y);
 }
@@ -291,87 +363,60 @@ inline float exp(float p_x) {
 	return ::expf(p_x);
 }
 
-inline double sin(double p_x) {
+inline real_t sin(Radian p_x) {
 	return ::sin(p_x);
 }
-inline float sin(float p_x) {
-	return ::sinf(p_x);
-}
 
-inline double cos(double p_x) {
+inline real_t cos(Radian p_x) {
 	return ::cos(p_x);
 }
-inline float cos(float p_x) {
-	return ::cosf(p_x);
-}
 
-inline double tan(double p_x) {
+inline real_t tan(Radian p_x) {
 	return ::tan(p_x);
 }
-inline float tan(float p_x) {
-	return ::tanf(p_x);
-}
 
-inline double sinh(double p_x) {
+inline real_t sinh(Radian p_x) {
 	return ::sinh(p_x);
 }
-inline float sinh(float p_x) {
-	return ::sinhf(p_x);
-}
 
-inline float sinc(float p_x) {
-	return p_x == 0 ? 1 : ::sin(p_x) / p_x;
-}
-inline double sinc(double p_x) {
+inline real_t sinc(Radian p_x) {
 	return p_x == 0 ? 1 : ::sin(p_x) / p_x;
 }
 
-inline float sincn(float p_x) {
-	return (float)sinc(Math_PI * p_x);
-}
-inline double sincn(double p_x) {
+inline real_t sincn(Radian p_x) {
 	return sinc(Math_PI * p_x);
 }
 
-inline double cosh(double p_x) {
+inline real_t cosh(Radian p_x) {
 	return ::cosh(p_x);
 }
-inline float cosh(float p_x) {
-	return ::coshf(p_x);
-}
 
-inline double tanh(double p_x) {
+inline real_t tanh(Radian p_x) {
 	return ::tanh(p_x);
 }
-inline float tanh(float p_x) {
-	return ::tanhf(p_x);
-}
 
-inline double asin(double p_x) {
+inline Radian asin(Radian p_x) {
 	return ::asin(p_x);
 }
-inline float asin(float p_x) {
-	return ::asinf(p_x);
-}
 
-inline double acos(double p_x) {
+inline Radian acos(double p_x) {
 	return ::acos(p_x);
 }
-inline float acos(float p_x) {
+inline Radian acos(float p_x) {
 	return ::acosf(p_x);
 }
 
-inline double atan(double p_x) {
+inline Radian atan(double p_x) {
 	return ::atan(p_x);
 }
-inline float atan(float p_x) {
+inline Radian atan(float p_x) {
 	return ::atanf(p_x);
 }
 
-inline double atan2(double p_y, double p_x) {
+inline Radian atan2(double p_y, double p_x) {
 	return ::atan2(p_y, p_x);
 }
-inline float atan2(float p_y, float p_x) {
+inline Radian atan2(float p_y, float p_x) {
 	return ::atan2f(p_y, p_x);
 }
 
@@ -411,6 +456,16 @@ inline double lerp_angle(double p_from, double p_to, double p_weight) {
 inline float lerp_angle(float p_from, float p_to, float p_weight) {
 	float difference = fmod(p_to - p_from, (float)Math_TAU);
 	float distance = fmod(2.0f * difference, (float)Math_TAU) - difference;
+	return p_from + distance * p_weight;
+}
+inline Radian lerp_angle(Radian p_from, Radian p_to, real_t p_weight) {
+	Radian difference = fmod(p_to - p_from, (real_t)Math_TAU);
+	Radian distance = fmod((real_t)2.0 * difference, (real_t)Math_TAU) - difference;
+	return p_from + distance * p_weight;
+}
+inline Degree lerp_angle(Degree p_from, Degree p_to, real_t p_weight) {
+	Degree difference = fmod(p_to - p_from, (real_t)Math_TAU);
+	Degree distance = fmod((real_t)2.0 * difference, (real_t)Math_TAU) - difference;
 	return p_from + distance * p_weight;
 }
 
@@ -456,6 +511,36 @@ inline float cubic_interpolate_angle(float p_from, float p_to, float p_pre, floa
 
 	float post_diff = fmod(p_post - to_rot, (float)Math_TAU);
 	float post_rot = to_rot + fmod(2.0f * post_diff, (float)Math_TAU) - post_diff;
+
+	return cubic_interpolate(from_rot, to_rot, pre_rot, post_rot, p_weight);
+}
+
+inline Radian cubic_interpolate_angle(Radian p_from, Radian p_to, Radian p_pre, Radian p_post, real_t p_weight) {
+	Radian from_rot = fmod(p_from, (real_t)Math_TAU);
+
+	Radian pre_diff = fmod(p_pre - from_rot, (real_t)Math_TAU);
+	Radian pre_rot = from_rot + fmod(2.0f * pre_diff, (real_t)Math_TAU) - pre_diff;
+
+	Radian to_diff = fmod(p_to - from_rot, (real_t)Math_TAU);
+	Radian to_rot = from_rot + fmod(2.0f * to_diff, (real_t)Math_TAU) - to_diff;
+
+	Radian post_diff = fmod(p_post - to_rot, (real_t)Math_TAU);
+	Radian post_rot = to_rot + fmod(2.0f * post_diff, (real_t)Math_TAU) - post_diff;
+
+	return cubic_interpolate(from_rot, to_rot, pre_rot, post_rot, p_weight);
+}
+
+inline Degree cubic_interpolate_angle(Degree p_from, Degree p_to, Degree p_pre, Degree p_post, real_t p_weight) {
+	Degree from_rot = fmod(p_from, (real_t)Math_TAU);
+
+	Degree pre_diff = fmod(p_pre - from_rot, (real_t)Math_TAU);
+	Degree pre_rot = from_rot + fmod(2.0f * pre_diff, (real_t)Math_TAU) - pre_diff;
+
+	Degree to_diff = fmod(p_to - from_rot, (real_t)Math_TAU);
+	Degree to_rot = from_rot + fmod(2.0f * to_diff, (real_t)Math_TAU) - to_diff;
+
+	Degree post_diff = fmod(p_post - to_rot, (real_t)Math_TAU);
+	Degree post_rot = to_rot + fmod(2.0f * post_diff, (real_t)Math_TAU) - post_diff;
 
 	return cubic_interpolate(from_rot, to_rot, pre_rot, post_rot, p_weight);
 }
@@ -516,6 +601,38 @@ inline float cubic_interpolate_angle_in_time(float p_from, float p_to, float p_p
 	return cubic_interpolate_in_time(from_rot, to_rot, pre_rot, post_rot, p_weight, p_to_t, p_pre_t, p_post_t);
 }
 
+inline Radian cubic_interpolate_angle_in_time(Radian p_from, Radian p_to, Radian p_pre, Radian p_post, real_t p_weight,
+		Radian p_to_t, Radian p_pre_t, Radian p_post_t) {
+	Radian from_rot = fmod(p_from, (real_t)Math_TAU);
+
+	Radian pre_diff = fmod(p_pre - from_rot, (real_t)Math_TAU);
+	Radian pre_rot = from_rot + fmod(2.0f * pre_diff, (real_t)Math_TAU) - pre_diff;
+
+	Radian to_diff = fmod(p_to - from_rot, (real_t)Math_TAU);
+	Radian to_rot = from_rot + fmod(2.0f * to_diff, (float)Math_TAU) - to_diff;
+
+	Radian post_diff = fmod(p_post - to_rot, (real_t)Math_TAU);
+	Radian post_rot = to_rot + fmod(2.0f * post_diff, (real_t)Math_TAU) - post_diff;
+
+	return cubic_interpolate_in_time(from_rot, to_rot, pre_rot, post_rot, p_weight, p_to_t, p_pre_t, p_post_t);
+}
+
+inline Degree cubic_interpolate_angle_in_time(Degree p_from, Degree p_to, Degree p_pre, Degree p_post, real_t p_weight,
+		Degree p_to_t, Degree p_pre_t, Degree p_post_t) {
+	Degree from_rot = fmod(p_from, (real_t)Math_TAU);
+
+	Degree pre_diff = fmod(p_pre - from_rot, (real_t)Math_TAU);
+	Degree pre_rot = from_rot + fmod(2.0f * pre_diff, (real_t)Math_TAU) - pre_diff;
+
+	Degree to_diff = fmod(p_to - from_rot, (real_t)Math_TAU);
+	Degree to_rot = from_rot + fmod(2.0f * to_diff, (float)Math_TAU) - to_diff;
+
+	Degree post_diff = fmod(p_post - to_rot, (real_t)Math_TAU);
+	Degree post_rot = to_rot + fmod(2.0f * post_diff, (real_t)Math_TAU) - post_diff;
+
+	return cubic_interpolate_in_time(from_rot, to_rot, pre_rot, post_rot, p_weight, p_to_t, p_pre_t, p_post_t);
+}
+
 inline double bezier_interpolate(double p_start, double p_control_1, double p_control_2, double p_end, double p_t) {
 	/* Formula from Wikipedia article on Bezier curves. */
 	double omt = (1.0 - p_t);
@@ -569,24 +686,16 @@ inline T abs(T x) {
 	return std::abs(x);
 }
 
-inline double deg_to_rad(double p_y) {
-	return p_y * Math_PI / 180.0;
-}
-inline float deg_to_rad(float p_y) {
-	return p_y * static_cast<float>(Math_PI) / 180.f;
-}
-
-inline double rad_to_deg(double p_y) {
-	return p_y * 180.0 / Math_PI;
-}
-inline float rad_to_deg(float p_y) {
-	return p_y * 180.f / static_cast<float>(Math_PI);
-}
-
 inline double inverse_lerp(double p_from, double p_to, double p_value) {
 	return (p_value - p_from) / (p_to - p_from);
 }
 inline float inverse_lerp(float p_from, float p_to, float p_value) {
+	return (p_value - p_from) / (p_to - p_from);
+}
+inline Radian inverse_lerp(Radian p_from, Radian p_to, double p_value) {
+	return (p_value - p_from) / (p_to - p_from);
+}
+inline Degree inverse_lerp(Degree p_from, Degree p_to, double p_value) {
 	return (p_value - p_from) / (p_to - p_from);
 }
 
@@ -665,6 +774,58 @@ inline bool is_zero_approx(double s) {
 	return abs(s) < CMP_EPSILON;
 }
 
+inline bool is_equal_approx(Radian a, Radian b) {
+	// Check for exact equality first, required to handle "infinity" values.
+	if (a == b) {
+		return true;
+	}
+	// Then check for approximate equality.
+	real_t tolerance = (real_t)CMP_EPSILON * abs(a);
+	if (tolerance < (real_t)CMP_EPSILON) {
+		tolerance = (real_t)CMP_EPSILON;
+	}
+	return abs(a - b) < tolerance;
+}
+
+inline bool is_equal_approx(Radian a, Radian b, real_t tolerance) {
+	// Check for exact equality first, required to handle "infinity" values.
+	if (a == b) {
+		return true;
+	}
+	// Then check for approximate equality.
+	return abs(a - b) < tolerance;
+}
+
+inline bool is_zero_approx(Radian s) {
+	return abs(s) < (real_t)CMP_EPSILON;
+}
+
+inline bool is_equal_approx(Degree a, Degree b) {
+	// Check for exact equality first, required to handle "infinity" values.
+	if (a == b) {
+		return true;
+	}
+	// Then check for approximate equality.
+	real_t tolerance = (real_t)CMP_EPSILON * abs(a);
+	if (tolerance < (real_t)CMP_EPSILON) {
+		tolerance = (real_t)CMP_EPSILON;
+	}
+	return abs(a - b) < tolerance;
+}
+
+inline bool is_equal_approx(Degree a, Degree b, real_t tolerance) {
+	// Check for exact equality first, required to handle "infinity" values.
+	if (a == b) {
+		return true;
+	}
+	// Then check for approximate equality.
+	return abs(a - b) < tolerance;
+}
+
+inline bool is_zero_approx(Degree s) {
+	return abs(s) < (real_t)CMP_EPSILON;
+}
+
 inline float absf(float g) {
 	union {
 		float f;
@@ -738,6 +899,23 @@ inline int64_t wrapi(int64_t value, int64_t min, int64_t max) {
 inline float wrapf(real_t value, real_t min, real_t max) {
 	const real_t range = max - min;
 	return is_zero_approx(range) ? min : value - (range * floor((value - min) / range));
+}
+
+inline Radian wrapf(Radian value, Radian min, Radian max) {
+	const Radian range = max - min;
+	return is_zero_approx(range) ? min : Radian(value - (range * floor((value - min) / range)));
+}
+
+inline Degree wrapf(Degree value, Degree min, Degree max) {
+	const Degree range = max - min;
+	return is_zero_approx(range) ? min : Degree(value - (range * floor((value - min) / range)));
+}
+
+inline Radian angle_wrap(Radian value) {
+	return wrapf((Degree)value, (Degree)0, (Degree)360);
+}
+inline Degree angle_wrap(Degree value) {
+	return wrapf(value, (Degree)0, (Degree)360);
 }
 
 inline float fract(float value) {
