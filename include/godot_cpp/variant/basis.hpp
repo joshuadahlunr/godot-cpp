@@ -75,11 +75,11 @@ struct _NO_DISCARD_ Basis {
 
 	void from_z(const Vector3 &p_z);
 
-	void rotate(const Vector3 &p_axis, real_t p_angle);
-	Basis rotated(const Vector3 &p_axis, real_t p_angle) const;
+	void rotate(const Vector3 &p_axis, Math::Radian p_angle);
+	Basis rotated(const Vector3 &p_axis, Math::Radian p_angle) const;
 
-	void rotate_local(const Vector3 &p_axis, real_t p_angle);
-	Basis rotated_local(const Vector3 &p_axis, real_t p_angle) const;
+	void rotate_local(const Vector3 &p_axis, Math::Radian p_angle);
+	Basis rotated_local(const Vector3 &p_axis, Math::Radian p_angle) const;
 
 	void rotate(const Vector3 &p_euler, EulerOrder p_order = EULER_ORDER_YXZ);
 	Basis rotated(const Vector3 &p_euler, EulerOrder p_order = EULER_ORDER_YXZ) const;
@@ -88,8 +88,8 @@ struct _NO_DISCARD_ Basis {
 	Basis rotated(const Quaternion &p_quaternion) const;
 
 	Vector3 get_euler_normalized(EulerOrder p_order = EULER_ORDER_YXZ) const;
-	void get_rotation_axis_angle(Vector3 &p_axis, real_t &p_angle) const;
-	void get_rotation_axis_angle_local(Vector3 &p_axis, real_t &p_angle) const;
+	void get_rotation_axis_angle(Vector3 &p_axis, Math::Radian &p_angle) const;
+	void get_rotation_axis_angle_local(Vector3 &p_axis, Math::Radian &p_angle) const;
 	Quaternion get_rotation_quaternion() const;
 
 	void rotate_to_align(Vector3 p_start_direction, Vector3 p_end_direction);
@@ -107,8 +107,8 @@ struct _NO_DISCARD_ Basis {
 	Quaternion get_quaternion() const;
 	void set_quaternion(const Quaternion &p_quaternion);
 
-	void get_axis_angle(Vector3 &r_axis, real_t &r_angle) const;
-	void set_axis_angle(const Vector3 &p_axis, real_t p_angle);
+	void get_axis_angle(Vector3 &r_axis, Math::Radian &r_angle) const;
+	void set_axis_angle(const Vector3 &p_axis, Math::Radian p_angle);
 
 	void scale(const Vector3 &p_scale);
 	Basis scaled(const Vector3 &p_scale) const;

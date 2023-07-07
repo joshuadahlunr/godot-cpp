@@ -67,7 +67,7 @@ Transform2D Transform2D::affine_inverse() const {
 	return inv;
 }
 
-void Transform2D::rotate(const real_t p_angle) {
+void Transform2D::rotate(const Math::Radian p_angle) {
 	*this = Transform2D(p_angle, Vector2()) * (*this);
 }
 
@@ -81,11 +81,11 @@ void Transform2D::set_skew(const real_t p_angle) {
 	columns[1] = SIGN(det) * columns[0].rotated(((real_t)Math_PI * 0.5f + p_angle)).normalized() * columns[1].length();
 }
 
-real_t Transform2D::get_rotation() const {
+Math::Radian Transform2D::get_rotation() const {
 	return Math::atan2(columns[0].y, columns[0].x);
 }
 
-void Transform2D::set_rotation(const real_t p_rot) {
+void Transform2D::set_rotation(const Math::Radian p_rot) {
 	Size2 scale = get_scale();
 	real_t cr = Math::cos(p_rot);
 	real_t sr = Math::sin(p_rot);
@@ -96,7 +96,7 @@ void Transform2D::set_rotation(const real_t p_rot) {
 	set_scale(scale);
 }
 
-Transform2D::Transform2D(const real_t p_rot, const Vector2 &p_pos) {
+Transform2D::Transform2D(const Math::Radian p_rot, const Vector2 &p_pos) {
 	real_t cr = Math::cos(p_rot);
 	real_t sr = Math::sin(p_rot);
 	columns[0][0] = cr;
@@ -106,7 +106,7 @@ Transform2D::Transform2D(const real_t p_rot, const Vector2 &p_pos) {
 	columns[2] = p_pos;
 }
 
-Transform2D::Transform2D(const real_t p_rot, const Size2 &p_scale, const real_t p_skew, const Vector2 &p_pos) {
+Transform2D::Transform2D(const Math::Radian p_rot, const Size2 &p_scale, const real_t p_skew, const Vector2 &p_pos) {
 	columns[0][0] = Math::cos(p_rot) * p_scale.x;
 	columns[1][1] = Math::cos(p_rot + p_skew) * p_scale.y;
 	columns[1][0] = -Math::sin(p_rot + p_skew) * p_scale.y;
@@ -253,12 +253,12 @@ Transform2D Transform2D::translated_local(const Vector2 &p_offset) const {
 	return Transform2D(columns[0], columns[1], columns[2] + basis_xform(p_offset));
 }
 
-Transform2D Transform2D::rotated(const real_t p_angle) const {
+Transform2D Transform2D::rotated(const Math::Radian p_angle) const {
 	// Equivalent to left multiplication
 	return Transform2D(p_angle, Vector2()) * (*this);
 }
 
-Transform2D Transform2D::rotated_local(const real_t p_angle) const {
+Transform2D Transform2D::rotated_local(const Math::Radian p_angle) const {
 	// Equivalent to right multiplication
 	return (*this) * Transform2D(p_angle, Vector2()); // Could be optimized, because origin transform can be skipped.
 }

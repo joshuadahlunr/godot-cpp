@@ -58,23 +58,23 @@ Transform3D Transform3D::inverse() const {
 	return ret;
 }
 
-void Transform3D::rotate(const Vector3 &p_axis, real_t p_angle) {
+void Transform3D::rotate(const Vector3 &p_axis, Math::Radian p_angle) {
 	*this = rotated(p_axis, p_angle);
 }
 
-Transform3D Transform3D::rotated(const Vector3 &p_axis, real_t p_angle) const {
+Transform3D Transform3D::rotated(const Vector3 &p_axis, Math::Radian p_angle) const {
 	// Equivalent to left multiplication
 	Basis p_basis(p_axis, p_angle);
 	return Transform3D(p_basis * basis, p_basis.xform(origin));
 }
 
-Transform3D Transform3D::rotated_local(const Vector3 &p_axis, real_t p_angle) const {
+Transform3D Transform3D::rotated_local(const Vector3 &p_axis, Math::Radian p_angle) const {
 	// Equivalent to right multiplication
 	Basis p_basis(p_axis, p_angle);
 	return Transform3D(basis * p_basis, origin);
 }
 
-void Transform3D::rotate_basis(const Vector3 &p_axis, real_t p_angle) {
+void Transform3D::rotate_basis(const Vector3 &p_axis, Math::Radian p_angle) {
 	basis.rotate(p_axis, p_angle);
 }
 

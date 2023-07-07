@@ -35,11 +35,11 @@
 
 namespace godot {
 
-real_t Vector2::angle() const {
+Math::Radian Vector2::angle() const {
 	return Math::atan2(y, x);
 }
 
-Vector2 Vector2::from_angle(const real_t p_angle) {
+Vector2 Vector2::from_angle(const Math::Radian p_angle) {
 	return Vector2(Math::cos(p_angle), Math::sin(p_angle));
 }
 
@@ -79,11 +79,11 @@ real_t Vector2::distance_squared_to(const Vector2 &p_vector2) const {
 	return (x - p_vector2.x) * (x - p_vector2.x) + (y - p_vector2.y) * (y - p_vector2.y);
 }
 
-real_t Vector2::angle_to(const Vector2 &p_vector2) const {
+Math::Radian Vector2::angle_to(const Vector2 &p_vector2) const {
 	return Math::atan2(cross(p_vector2), dot(p_vector2));
 }
 
-real_t Vector2::angle_to_point(const Vector2 &p_vector2) const {
+Math::Radian Vector2::angle_to_point(const Vector2 &p_vector2) const {
 	return (p_vector2 - *this).angle();
 }
 
@@ -111,7 +111,7 @@ Vector2 Vector2::round() const {
 	return Vector2(Math::round(x), Math::round(y));
 }
 
-Vector2 Vector2::rotated(const real_t p_by) const {
+Vector2 Vector2::rotated(const Math::Radian p_by) const {
 	real_t sine = Math::sin(p_by);
 	real_t cosi = Math::cos(p_by);
 	return Vector2(

@@ -299,7 +299,7 @@ Vector3 Quaternion::get_axis() const {
 	return Vector3(x * r, y * r, z * r);
 }
 
-real_t Quaternion::get_angle() const {
+Math::Radian Quaternion::get_angle() const {
 	return 2 * Math::acos(w);
 }
 

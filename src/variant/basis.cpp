@@ -348,21 +348,21 @@ Vector3 Basis::rotref_posscale_decomposition(Basis &rotref) const {
 // The main use of Basis is as Transform.basis, which is used by the transformation matrix
 // of 3D object. Rotate here refers to rotation of the object (which is R * (*this)),
 // not the matrix itself (which is R * (*this) * R.transposed()).
-Basis Basis::rotated(const Vector3 &p_axis, real_t p_angle) const {
+Basis Basis::rotated(const Vector3 &p_axis, Math::Radian p_angle) const {
 	return Basis(p_axis, p_angle) * (*this);
 }
 
-void Basis::rotate(const Vector3 &p_axis, real_t p_angle) {
+void Basis::rotate(const Vector3 &p_axis, Math::Radian p_angle) {
 	*this = rotated(p_axis, p_angle);
 }
 
-void Basis::rotate_local(const Vector3 &p_axis, real_t p_angle) {
+void Basis::rotate_local(const Vector3 &p_axis, Math::Radian p_angle) {
 	// performs a rotation in object-local coordinate system:
 	// M -> (M.R.Minv).M = M.R.
 	*this = rotated_local(p_axis, p_angle);
 }
 
-Basis Basis::rotated_local(const Vector3 &p_axis, real_t p_angle) const {
+Basis Basis::rotated_local(const Vector3 &p_axis, Math::Radian p_angle) const {
 	return (*this) * Basis(p_axis, p_angle);
 }
 
@@ -422,7 +422,7 @@ void Basis::rotate_to_align(Vector3 p_start_direction, Vector3 p_end_direction) 
 	}
 }
 
-void Basis::get_rotation_axis_angle(Vector3 &p_axis, real_t &p_angle) const {
+void Basis::get_rotation_axis_angle(Vector3 &p_axis, Math::Radian &p_angle) const {
 	// Assumes that the matrix can be decomposed into a proper rotation and scaling matrix as M = R.S,
 	// and returns the Euler angles corresponding to the rotation part, complementing get_scale().
 	// See the comment in get_scale() for further information.
@@ -436,7 +436,7 @@ void Basis::get_rotation_axis_angle(Vector3 &p_axis, real_t &p_angle) const {
 	m.get_axis_angle(p_axis, p_angle);
 }
 
-void Basis::get_rotation_axis_angle_local(Vector3 &p_axis, real_t &p_angle) const {
+void Basis::get_rotation_axis_angle_local(Vector3 &p_axis, Math::Radian &p_angle) const {
 	// Assumes that the matrix can be decomposed into a proper rotation and scaling matrix as M = R.S,
 	// and returns the Euler angles corresponding to the rotation part, complementing get_scale().
 	// See the comment in get_scale() for further information.
@@ -750,7 +750,7 @@ Quaternion Basis::get_quaternion() const {
 	return Quaternion(temp[0], temp[1], temp[2], temp[3]);
 }
 
-void Basis::get_axis_angle(Vector3 &r_axis, real_t &r_angle) const {
+void Basis::get_axis_angle(Vector3 &r_axis, Math::Radian &r_angle) const {
 	/* checking this is a bad idea, because obtaining from scaled transform is a valid use case
 #ifdef MATH_CHECKS
 	ERR_FAIL_COND(!is_rotation());
@@ -840,7 +840,7 @@ void Basis::set_quaternion(const Quaternion &p_quaternion) {
 			xz - wy, yz + wx, 1.0f - (xx + yy));
 }
 
-void Basis::set_axis_angle(const Vector3 &p_axis, real_t p_angle) {
+void Basis::set_axis_angle(const Vector3 &p_axis, Math::Radian p_angle) {
 // Rotation matrix from axis and angle, see https://en.wikipedia.org/wiki/Rotation_matrix#Rotation_matrix_from_axis_angle
 #ifdef MATH_CHECKS
 	ERR_FAIL_COND_MSG(!p_axis.is_normalized(), "The axis Vector3 must be normalized.");

@@ -74,9 +74,9 @@ struct _NO_DISCARD_ Transform2D {
 	void affine_invert();
 	Transform2D affine_inverse() const;
 
-	void set_rotation(const real_t p_rot);
-	real_t get_rotation() const;
-	godot::Property<real_t, &Transform2D::get_rotation, &Transform2D::set_rotation> rotation() { return this; }
+	void set_rotation(const Math::Radian p_rot);
+	Math::Radian get_rotation() const;
+	godot::Property<Math::Radian, &Transform2D::get_rotation, &Transform2D::set_rotation> rotation() { return this; }
 
 	real_t get_skew() const;
 	void set_skew(const real_t p_angle);
@@ -84,7 +84,7 @@ struct _NO_DISCARD_ Transform2D {
 	
 	_FORCE_INLINE_ void set_rotation_and_scale(const real_t p_rot, const Size2 &p_scale);
 	_FORCE_INLINE_ void set_rotation_scale_and_skew(const real_t p_rot, const Size2 &p_scale, const real_t p_skew);
-	void rotate(const real_t p_angle);
+	void rotate(const Math::Radian p_angle);
 
 	void scale(const Size2 &p_scale);
 	void scale_basis(const Size2 &p_scale);
@@ -105,8 +105,8 @@ struct _NO_DISCARD_ Transform2D {
 	Transform2D scaled_local(const Size2 &p_scale) const;
 	Transform2D translated(const Vector2 &p_offset) const;
 	Transform2D translated_local(const Vector2 &p_offset) const;
-	Transform2D rotated(const real_t p_angle) const;
-	Transform2D rotated_local(const real_t p_angle) const;
+	Transform2D rotated(const Math::Radian p_angle) const;
+	Transform2D rotated_local(const Math::Radian p_angle) const;
 
 	Transform2D untranslated() const;
 
@@ -152,9 +152,9 @@ struct _NO_DISCARD_ Transform2D {
 		columns[2] = p_origin;
 	}
 
-	Transform2D(const real_t p_rot, const Vector2 &p_pos);
+	Transform2D(const Math::Radian p_rot, const Vector2 &p_pos);
 
-	Transform2D(const real_t p_rot, const Size2 &p_scale, const real_t p_skew, const Vector2 &p_pos);
+	Transform2D(const Math::Radian p_rot, const Size2 &p_scale, const real_t p_skew, const Vector2 &p_pos);
 
 	Transform2D() {
 		columns[0][0] = 1.0;
@@ -295,7 +295,7 @@ public:
 	GODOT_PROPERTY_WRAPPED_FUNCTION(affine_inverse, Self)
 	GODOT_PROPERTY_WRAPPED_FUNCTION(set_rotation, Self)
 	GODOT_PROPERTY_WRAPPED_FUNCTION(get_rotation, Self)
-	GODOT_PROPERTY_WRAPPED_PROPERTY_NO_GET_SET(real_t, rotation, Self);
+	GODOT_PROPERTY_WRAPPED_PROPERTY_NO_GET_SET(Math::Radian, rotation, Self);
 	GODOT_PROPERTY_WRAPPED_FUNCTION(get_skew, Self)
 	GODOT_PROPERTY_WRAPPED_FUNCTION(set_skew, Self)
 	GODOT_PROPERTY_WRAPPED_PROPERTY_NO_GET_SET(real_t, skew, Self);

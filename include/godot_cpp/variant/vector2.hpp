@@ -98,8 +98,8 @@ struct _NO_DISCARD_ Vector2 {
 
 	real_t distance_to(const Vector2 &p_vector2) const;
 	real_t distance_squared_to(const Vector2 &p_vector2) const;
-	real_t angle_to(const Vector2 &p_vector2) const;
-	real_t angle_to_point(const Vector2 &p_vector2) const;
+	Math::Radian angle_to(const Vector2 &p_vector2) const;
+	Math::Radian angle_to_point(const Vector2 &p_vector2) const;
 	_FORCE_INLINE_ Vector2 direction_to(const Vector2 &p_to) const;
 
 	real_t dot(const Vector2 &p_other) const;
@@ -152,14 +152,14 @@ struct _NO_DISCARD_ Vector2 {
 	bool operator<=(const Vector2 &p_vec2) const { return x == p_vec2.x ? (y <= p_vec2.y) : (x < p_vec2.x); }
 	bool operator>=(const Vector2 &p_vec2) const { return x == p_vec2.x ? (y >= p_vec2.y) : (x > p_vec2.x); }
 
-	real_t angle() const;
-	static Vector2 from_angle(const real_t p_angle);
+	Math::Radian angle() const;
+	static Vector2 from_angle(const Math::Radian p_angle);
 
 	_FORCE_INLINE_ Vector2 abs() const {
 		return Vector2(Math::abs(x), Math::abs(y));
 	}
 
-	Vector2 rotated(const real_t p_by) const;
+	Vector2 rotated(const Math::Radian p_by) const;
 	Vector2 orthogonal() const {
 		return Vector2(y, -x);
 	}
