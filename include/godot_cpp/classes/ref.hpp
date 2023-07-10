@@ -199,16 +199,20 @@ public:
 
 	inline bool is_valid() const { return reference != nullptr; }
 	inline bool is_null() const { return reference == nullptr; }
+	inline bool operator==(std::nullptr_t) const { return is_null(); }
+	inline bool operator!=(std::nullptr_t) const { return is_valid(); }
 
-	void unref() {
+	Ref& unref() {
 		if (reference && reference->unreference()) {
 			memdelete(reference);
 		}
 		reference = nullptr;
+		return *this;
 	}
 
-	void instantiate() {
+	Ref& instantiate() {
 		ref(memnew(T()));
+		return *this;
 	}
 
 	Ref() {}
