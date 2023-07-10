@@ -1496,6 +1496,12 @@ def generate_engine_class_header(class_api, used_classes, fully_used_classes, us
         result.append("\ttemplate<class T>")
         result.append("\tstatic const T *cast_to(const Object *p_object);")
 
+        result.append("\ttemplate<class T>")
+        result.append("\tT* cast_to() { return Object::cast_to<T>(this); }")
+
+        result.append("\ttemplate<class T>")
+        result.append("\tconst T* cast_to() const { return Object::cast_to<T>(this); }")
+
         result.append("\tvirtual ~Object() = default;")
 
     elif use_template_get_node and class_name == "Node":
