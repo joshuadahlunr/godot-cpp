@@ -1351,6 +1351,11 @@ def generate_engine_class_header(class_api, used_classes, fully_used_classes, us
             result.append(f'\tstatic const {value["type"]} {value["name"]} = {value["value"]};')
         result.append("")
 
+    if "signals" in class_api:
+        for signal in class_api["signals"]:
+            result.append(f"\tSignal {signal['name']}() {{ return {{this, \"{signal['name']}\"}}; }}")
+        result.append("")
+
     if is_singleton:
         result.append(f"\tstatic {class_name} *get_singleton();")
         result.append("")
@@ -2029,15 +2034,17 @@ def generate_property_version(api, listed_methods=None):
         result.append("")
 
 
+    if "signals" in api:
+        for signal in api["signals"]:
+            result.append(f"\tGODOT_PROPERTY_WRAPPED_FUNCTION({signal['name']}, Self)")
+        result.append("")
 
     if "members" in api:
         for member in api["members"]:
             result.append(f"\tGODOT_PROPERTY_WRAPPED_PROPERTY({member['meta']}, {member['member']}, Self)")
-            print(f"member: {member}")
-
-    if "properties" in api:
         result.append("")
 
+    if "properties" in api:
         for prop in api["properties"]:
             prop_type = prop["type"]
             if "getter" in prop and "methods" in api:
@@ -2050,10 +2057,9 @@ def generate_property_version(api, listed_methods=None):
 
             name = prop["name"] if prop["name"] != "operator" else prop["name"] + "_"
             result.append(f"\tGODOT_PROPERTY_WRAPPED_PROPERTY_CALL({cleanup_property_type(prop_type)}, {name}, Self)")
-
-    if "methods" in api:
         result.append("")
 
+    if "methods" in api:
         for method in api["methods"]:
             if "is_static" in method and method["is_static"]: continue
             if method["name"] == "get_node": continue
@@ -2076,6 +2082,7 @@ def generate_property_version(api, listed_methods=None):
                     result.append(f"\ttemplate<typename... Args> requires (getsetable<Self>) auto {name}(Args... args) {{ auto temp = get(); auto ret = temp.{name}(std::forward<Args>(args)...); set(temp); return ret; }}")
                     result.append(f"\ttemplate<typename... Args> requires (!getsetable<Self> && getable<Self>) auto {name}(Args... args) const {{ const auto temp = get(); auto ret = temp.{name}(std::forward<Args>(args)...); return ret; }}")
             else: result.append(f"\tGODOT_PROPERTY_WRAPPED_FUNCTION({name}, Self)")
+        result.append("")
 
     result.append("")
     result.append("};")
