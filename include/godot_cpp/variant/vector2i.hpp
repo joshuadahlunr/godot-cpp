@@ -31,6 +31,7 @@
 #ifndef GODOT_VECTOR2I_HPP
 #define GODOT_VECTOR2I_HPP
 
+#include <godot_cpp/classes/properties.hpp>
 #include <godot_cpp/core/error_macros.hpp>
 #include <godot_cpp/core/math.hpp>
 
@@ -155,6 +156,31 @@ _FORCE_INLINE_ Vector2i operator*(const double p_scalar, const Vector2i &p_vecto
 
 typedef Vector2i Size2i;
 typedef Vector2i Point2i;
+
+template <auto Getter, auto Setter> PROPERTY_TEMPLATE_CONSTRAINT(Getter, Setter)
+class Property<Vector2i, Getter, Setter> : public PropertyOperations<Property<Vector2i, Getter, Setter>> {
+    using T = Vector2i;
+    using Self = Property<Vector2i, Getter, Setter>;
+public:
+	PROPERTY_CORE(Getter, Setter)
+
+	GODOT_PROPERTY_WRAPPED_PROPERTY(int32_t, x, Self)
+	GODOT_PROPERTY_WRAPPED_PROPERTY(int32_t, y, Self)
+	GODOT_PROPERTY_WRAPPED_PROPERTY(int32_t, width, Self)
+	GODOT_PROPERTY_WRAPPED_PROPERTY(int32_t, height, Self)
+
+	GODOT_PROPERTY_WRAPPED_FUNCTION(min_axis_index, Self)	
+	GODOT_PROPERTY_WRAPPED_FUNCTION(max_axis_index, Self)	
+	GODOT_PROPERTY_WRAPPED_FUNCTION(min, Self)	
+	GODOT_PROPERTY_WRAPPED_FUNCTION(max, Self)	
+	GODOT_PROPERTY_WRAPPED_FUNCTION(length_squared, Self)	
+	GODOT_PROPERTY_WRAPPED_FUNCTION(length, Self)	
+	GODOT_PROPERTY_WRAPPED_FUNCTION(aspect, Self)	
+	GODOT_PROPERTY_WRAPPED_FUNCTION(sign, Self)	
+	GODOT_PROPERTY_WRAPPED_FUNCTION(abs, Self)	
+	GODOT_PROPERTY_WRAPPED_FUNCTION(clamp, Self)	
+
+};
 
 } // namespace godot
 

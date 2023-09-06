@@ -31,6 +31,7 @@
 #ifndef GODOT_VECTOR3I_HPP
 #define GODOT_VECTOR3I_HPP
 
+#include <godot_cpp/classes/properties.hpp>
 #include <godot_cpp/core/error_macros.hpp>
 #include <godot_cpp/core/math.hpp>
 
@@ -326,6 +327,28 @@ bool Vector3i::operator>=(const Vector3i &p_v) const {
 void Vector3i::zero() {
 	x = y = z = 0;
 }
+
+template <auto Getter, auto Setter> PROPERTY_TEMPLATE_CONSTRAINT(Getter, Setter)
+class Property<Vector3i, Getter, Setter> : public PropertyOperations<Property<Vector3i, Getter, Setter>> {
+    using T = Vector3i;
+    using Self = Property<Vector3i, Getter, Setter>;
+public:
+	PROPERTY_CORE(Getter, Setter)
+
+	GODOT_PROPERTY_WRAPPED_PROPERTY(int32_t, x, Self)
+	GODOT_PROPERTY_WRAPPED_PROPERTY(int32_t, y, Self)
+	GODOT_PROPERTY_WRAPPED_PROPERTY(int32_t, z, Self)
+
+	GODOT_PROPERTY_WRAPPED_FUNCTION(min_axis_index, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(max_axis_index, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(length_squared, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(length, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(zero, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(abs, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(sign, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(clamp, Self)
+
+};
 
 } // namespace godot
 

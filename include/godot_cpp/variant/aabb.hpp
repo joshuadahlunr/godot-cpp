@@ -31,6 +31,7 @@
 #ifndef GODOT_AABB_HPP
 #define GODOT_AABB_HPP
 
+#include <godot_cpp/classes/properties.hpp>
 #include <godot_cpp/variant/plane.hpp>
 #include <godot_cpp/variant/vector3.hpp>
 
@@ -488,6 +489,60 @@ AABB AABB::quantized(real_t p_unit) const {
 	ret.quantize(p_unit);
 	return ret;
 }
+
+
+
+template <auto Getter, auto Setter> PROPERTY_TEMPLATE_CONSTRAINT(Getter, Setter)
+class Property<AABB, Getter, Setter> : public PropertyOperations<Property<AABB, Getter, Setter>> {
+    using T = AABB;
+    using Self = Property<AABB, Getter, Setter>;
+public:
+	PROPERTY_CORE(Getter, Setter)
+
+	GODOT_PROPERTY_WRAPPED_PROPERTY(Vector3, position, Self)
+	GODOT_PROPERTY_WRAPPED_PROPERTY(Vector3, size, Self)
+
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_volume, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(has_volume, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(has_surface, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(is_equal_approx, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(intersects, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(intersects_inclusive, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(encloses, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(merge, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(merge_with, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(intersection, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(intersects_segment, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(intersects_ray, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(smits_intersect_ray, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(intersects_convex_shape, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(inside_convex_shape, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(intersects_plane, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(has_point, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_support, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_longest_axis, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_longest_axis_index, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_longest_axis_size, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_shortest_axis, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_shortest_axis_index, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_shortest_axis_size, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(grow, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(grow_by, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_edge, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_endpoint, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(expand, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(project_range_in_plane, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(expand_to, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(abs, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(intersects_segment_bind, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(intersects_ray_bind, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(quantize, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(quantized, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(set_end, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_end, Self)
+	GODOT_PROPERTY_WRAPPED_PROPERTY_NO_GET_SET(Vector3, end, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_center, Self)
+};
 
 } // namespace godot
 

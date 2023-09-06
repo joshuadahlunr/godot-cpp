@@ -31,6 +31,7 @@
 #ifndef GODOT_PROJECTION_HPP
 #define GODOT_PROJECTION_HPP
 
+#include <godot_cpp/classes/properties.hpp>
 #include <godot_cpp/core/math.hpp>
 #include <godot_cpp/variant/vector3.hpp>
 #include <godot_cpp/variant/vector4.hpp>
@@ -165,6 +166,103 @@ Vector3 Projection::xform(const Vector3 &p_vec3) const {
 	real_t w = columns[0][3] * p_vec3.x + columns[1][3] * p_vec3.y + columns[2][3] * p_vec3.z + columns[3][3];
 	return ret / w;
 }
+
+template <auto Getter, auto Setter> PROPERTY_TEMPLATE_CONSTRAINT(Getter, Setter)
+class Property<Projection, Getter, Setter> : public PropertyOperations<Property<Projection, Getter, Setter>> {
+    using T = Projection;
+    using Self = Property<Projection, Getter, Setter>;
+public:
+	PROPERTY_CORE(Getter, Setter)
+
+	GODOT_PROPERTY_WRAPPED_PROPERTY(Vector4*, columns, Self)
+
+	Vector4 get_x() const { return get_columns()[0]; }
+	Vector4 get_y() const { return get_columns()[1]; }
+	Vector4 get_z() const { return get_columns()[2]; }
+	Vector4 get_w() const { return get_columns()[3]; }
+
+	Vector4 set_x(Vector4 value) {
+		auto temp = get_columns();
+		temp[0] = value;
+		set_columns(temp);
+		return temp;
+	}
+	Vector4 set_y(Vector4 value) {
+		auto temp = get_columns();
+		temp[1] = value;
+		set_columns(temp);
+		return temp;
+	}
+	Vector4 set_z(Vector4 value) {
+		auto temp = get_columns();
+		temp[2] = value;
+		set_columns(temp);
+		return temp;
+	}
+	Vector4 set_w(Vector4 value) {
+		auto temp = get_columns();
+		temp[3] = value;
+		set_columns(temp);
+		return temp;
+	}
+
+	GODOT_PROPERTY_WRAPPED_PROPERTY_NO_GET_SET(Vector4, x, Self);
+	GODOT_PROPERTY_WRAPPED_PROPERTY_NO_GET_SET(Vector4, y, Self);
+	GODOT_PROPERTY_WRAPPED_PROPERTY_NO_GET_SET(Vector4, z, Self);
+	GODOT_PROPERTY_WRAPPED_PROPERTY_NO_GET_SET(Vector4, w, Self);
+
+	GODOT_PROPERTY_WRAPPED_FUNCTION(determinant, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(set_identity, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(set_zero, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(set_light_bias, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(set_depth_correction, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(set_light_atlas_rect, Self)
+	template<typename... Args> requires (getsetable<Self>) void set_perspective(Args... args) { auto temp = get(); temp.set_perspective(std::forward<Args>(args)...); set(temp); }
+	template<typename... Args> requires (!getsetable<Self> && getable<Self>) void set_perspective(Args... args) const { const auto temp = get(); temp.set_perspective(std::forward<Args>(args)...); }
+	GODOT_PROPERTY_WRAPPED_FUNCTION(set_for_hmd, Self)
+	template<typename... Args> requires (getsetable<Self>) void set_orthogonal(Args... args) { auto temp = get(); temp.set_orthogonal(std::forward<Args>(args)...); set(temp); }
+	template<typename... Args> requires (!getsetable<Self> && getable<Self>) void set_orthogonal(Args... args) const { const auto temp = get(); temp.set_orthogonal(std::forward<Args>(args)...); }
+	template<typename... Args> requires (getsetable<Self>) void set_frustum(Args... args) { auto temp = get(); temp.set_frustum(std::forward<Args>(args)...); set(temp); }
+	template<typename... Args> requires (!getsetable<Self> && getable<Self>) void set_frustum(Args... args) const { const auto temp = get(); temp.set_frustum(std::forward<Args>(args)...); }
+	GODOT_PROPERTY_WRAPPED_FUNCTION(adjust_perspective_znear, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(create_depth_correction, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(create_light_atlas_rect, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(create_perspective, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(create_perspective_hmd, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(create_for_hmd, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(create_orthogonal, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(create_orthogonal_aspect, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(create_frustum, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(create_frustum_aspect, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(create_fit_aabb, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(perspective_znear_adjusted, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_projection_plane, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(flipped_y, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(jitter_offseted, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_fovy, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_z_far, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_z_near, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_aspect, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_fov, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(is_orthogonal, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_projection_planes, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_endpoints, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_viewport_half_extents, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_far_plane_half_extents, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(invert, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(inverse, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(xform4, Self)
+	template<typename... Args> requires (getsetable<Self>) auto xform(Args... args) { auto temp = get(); auto ret = temp.xform(std::forward<Args>(args)...); set(temp); return ret; }
+	template<typename... Args> requires (!getsetable<Self> && getable<Self>) auto xform(Args... args) const { const auto temp = get(); auto ret = temp.xform(std::forward<Args>(args)...); return ret; }
+	GODOT_PROPERTY_WRAPPED_FUNCTION(xform_inv, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(scale_translate_to_fit, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(add_jitter_offset, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(make_scale, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_pixels_per_meter, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(flip_y, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_lod_multiplier, Self)
+
+};
 
 } // namespace godot
 

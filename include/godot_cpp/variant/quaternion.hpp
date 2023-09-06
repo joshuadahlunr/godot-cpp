@@ -31,6 +31,7 @@
 #ifndef GODOT_QUATERNION_HPP
 #define GODOT_QUATERNION_HPP
 
+#include <godot_cpp/classes/properties.hpp>
 #include <godot_cpp/core/math.hpp>
 #include <godot_cpp/variant/vector3.hpp>
 
@@ -231,6 +232,44 @@ bool Quaternion::operator!=(const Quaternion &p_quaternion) const {
 _FORCE_INLINE_ Quaternion operator*(const real_t &p_real, const Quaternion &p_quaternion) {
 	return p_quaternion * p_real;
 }
+
+template <auto Getter, auto Setter> PROPERTY_TEMPLATE_CONSTRAINT(Getter, Setter)
+class Property<Quaternion, Getter, Setter> : public PropertyOperations<Property<Quaternion, Getter, Setter>> {
+    using T = Quaternion;
+    using Self = Property<Quaternion, Getter, Setter>;
+public:
+	PROPERTY_CORE(Getter, Setter)
+
+	GODOT_PROPERTY_WRAPPED_PROPERTY(float, x, Self)
+	GODOT_PROPERTY_WRAPPED_PROPERTY(float, y, Self)
+	GODOT_PROPERTY_WRAPPED_PROPERTY(float, z, Self)
+	GODOT_PROPERTY_WRAPPED_PROPERTY(float, w, Self)
+
+	GODOT_PROPERTY_WRAPPED_FUNCTION(length_squared, Self);
+	GODOT_PROPERTY_WRAPPED_FUNCTION(is_equal_approx, Self);
+	GODOT_PROPERTY_WRAPPED_FUNCTION(length, Self);
+	GODOT_PROPERTY_WRAPPED_FUNCTION(normalize, Self);
+	GODOT_PROPERTY_WRAPPED_FUNCTION(normalized, Self);
+	GODOT_PROPERTY_WRAPPED_FUNCTION(is_normalized, Self);
+	GODOT_PROPERTY_WRAPPED_FUNCTION(inverse, Self);
+	GODOT_PROPERTY_WRAPPED_FUNCTION(log, Self);
+	GODOT_PROPERTY_WRAPPED_FUNCTION(exp, Self);
+	GODOT_PROPERTY_WRAPPED_FUNCTION(dot, Self);
+	GODOT_PROPERTY_WRAPPED_FUNCTION(angle_to, Self);
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_euler_xyz, Self);
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_euler_yxz, Self);
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_euler, Self);
+	GODOT_PROPERTY_WRAPPED_FUNCTION(slerp, Self);
+	GODOT_PROPERTY_WRAPPED_FUNCTION(slerpni, Self);
+	GODOT_PROPERTY_WRAPPED_FUNCTION(spherical_cubic_interpolate, Self);
+	GODOT_PROPERTY_WRAPPED_FUNCTION(spherical_cubic_interpolate_in_time, Self);
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_axis, Self);
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_angle, Self);
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_axis_angle, Self);
+	GODOT_PROPERTY_WRAPPED_FUNCTION(xform, Self);
+	GODOT_PROPERTY_WRAPPED_FUNCTION(xform_inv, Self);
+
+};
 
 } // namespace godot
 

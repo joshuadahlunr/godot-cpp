@@ -31,6 +31,7 @@
 #ifndef GODOT_COLOR_HPP
 #define GODOT_COLOR_HPP
 
+#include <godot_cpp/classes/properties.hpp>
 #include <godot_cpp/core/math.hpp>
 
 namespace godot {
@@ -206,16 +207,23 @@ struct _NO_DISCARD_ Color {
 	// For the binder.
 	_FORCE_INLINE_ void set_r8(int32_t r8) { r = (CLAMP(r8, 0, 255) / 255.0f); }
 	_FORCE_INLINE_ int32_t get_r8() const { return int32_t(CLAMP(Math::round(r * 255.0f), 0.0f, 255.0f)); }
+	godot::Property<int32_t, &Color::get_r8, &Color::set_r8> r8() { return this; }
 	_FORCE_INLINE_ void set_g8(int32_t g8) { g = (CLAMP(g8, 0, 255) / 255.0f); }
 	_FORCE_INLINE_ int32_t get_g8() const { return int32_t(CLAMP(Math::round(g * 255.0f), 0.0f, 255.0f)); }
+	godot::Property<int32_t, &Color::get_g8, &Color::set_g8> g8() { return this; }
 	_FORCE_INLINE_ void set_b8(int32_t b8) { b = (CLAMP(b8, 0, 255) / 255.0f); }
 	_FORCE_INLINE_ int32_t get_b8() const { return int32_t(CLAMP(Math::round(b * 255.0f), 0.0f, 255.0f)); }
+	godot::Property<int32_t, &Color::get_b8, &Color::set_b8> b8() { return this; }
 	_FORCE_INLINE_ void set_a8(int32_t a8) { a = (CLAMP(a8, 0, 255) / 255.0f); }
 	_FORCE_INLINE_ int32_t get_a8() const { return int32_t(CLAMP(Math::round(a * 255.0f), 0.0f, 255.0f)); }
+	godot::Property<int32_t, &Color::get_a8, &Color::set_a8> a8() { return this; }
 
 	_FORCE_INLINE_ void set_h(float p_h) { set_hsv(p_h, get_s(), get_v(), a); }
+	godot::Property<float, &Color::get_h, &Color::set_h> h() { return this; }
 	_FORCE_INLINE_ void set_s(float p_s) { set_hsv(get_h(), p_s, get_v(), a); }
+	godot::Property<float, &Color::get_s, &Color::set_s> s() { return this; }
 	_FORCE_INLINE_ void set_v(float p_v) { set_hsv(get_h(), get_s(), p_v, a); }
+	godot::Property<float, &Color::get_v, &Color::set_v> v() { return this; }
 
 	_FORCE_INLINE_ Color() {}
 
@@ -283,6 +291,62 @@ bool Color::operator<(const Color &p_color) const {
 _FORCE_INLINE_ Color operator*(float p_scalar, const Color &p_color) {
 	return p_color * p_scalar;
 }
+
+template <auto Getter, auto Setter> PROPERTY_TEMPLATE_CONSTRAINT(Getter, Setter)
+class Property<Color, Getter, Setter> : public PropertyOperations<Property<Color, Getter, Setter>> {
+    using T = Color;
+    using Self = Property<Color, Getter, Setter>;
+public:
+	PROPERTY_CORE(Getter, Setter)
+
+	GODOT_PROPERTY_WRAPPED_PROPERTY(float, r, Self)
+	GODOT_PROPERTY_WRAPPED_PROPERTY(float, g, Self)
+	GODOT_PROPERTY_WRAPPED_PROPERTY(float, b, Self)
+	GODOT_PROPERTY_WRAPPED_PROPERTY(float, a, Self)
+	GODOT_PROPERTY_WRAPPED_PROPERTY_NO_GET_SET(int32_t, a8, Self)
+	GODOT_PROPERTY_WRAPPED_PROPERTY_NO_GET_SET(int32_t, b8, Self)
+	GODOT_PROPERTY_WRAPPED_PROPERTY_NO_GET_SET(int32_t, g8, Self)
+	GODOT_PROPERTY_WRAPPED_PROPERTY_NO_GET_SET(int32_t, r8, Self)
+	GODOT_PROPERTY_WRAPPED_PROPERTY_NO_GET_SET(float, h, Self)
+	GODOT_PROPERTY_WRAPPED_PROPERTY_NO_GET_SET(float, s, Self)
+	GODOT_PROPERTY_WRAPPED_PROPERTY_NO_GET_SET(float, v, Self)
+
+	GODOT_PROPERTY_WRAPPED_FUNCTION(to_rgba32, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(to_argb32, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(to_abgr32, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(to_rgba64, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(to_argb64, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(to_abgr64, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(to_html, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_h, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_s, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_v, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(set_hsv, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(is_equal_approx, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(clamp, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(invert, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(inverted, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_luminance, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(lerp, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(darkened, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(lightened, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(to_rgbe9995, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(blend, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(srgb_to_linear, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(linear_to_srgb, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(set_r8, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_r8, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(set_g8, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_g8, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(set_b8, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_b8, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(set_a8, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_a8, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(set_h, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(set_s, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(set_v, Self)
+
+};
 
 } // namespace godot
 

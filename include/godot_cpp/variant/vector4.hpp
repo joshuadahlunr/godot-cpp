@@ -31,6 +31,7 @@
 #ifndef GODOT_VECTOR4_HPP
 #define GODOT_VECTOR4_HPP
 
+#include <godot_cpp/classes/properties.hpp>
 #include <godot_cpp/core/error_macros.hpp>
 #include <godot_cpp/core/math.hpp>
 
@@ -304,6 +305,49 @@ _FORCE_INLINE_ Vector4 operator*(const int32_t p_scalar, const Vector4 &p_vec) {
 _FORCE_INLINE_ Vector4 operator*(const int64_t p_scalar, const Vector4 &p_vec) {
 	return p_vec * p_scalar;
 }
+
+
+template <auto Getter, auto Setter> PROPERTY_TEMPLATE_CONSTRAINT(Getter, Setter)
+class Property<Vector4, Getter, Setter> : public PropertyOperations<Property<Vector4, Getter, Setter>> {
+    using T = Vector4;
+    using Self = Property<Vector4, Getter, Setter>;
+public:
+	PROPERTY_CORE(Getter, Setter)
+	
+	GODOT_PROPERTY_WRAPPED_PROPERTY(real_t, x, Self)
+	GODOT_PROPERTY_WRAPPED_PROPERTY(real_t, y, Self)
+	GODOT_PROPERTY_WRAPPED_PROPERTY(real_t, z, Self)
+	GODOT_PROPERTY_WRAPPED_PROPERTY(real_t, w, Self)
+
+	GODOT_PROPERTY_WRAPPED_FUNCTION(min_axis_index, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(max_axis_index, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(length_squared, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(is_equal_approx, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(is_zero_approx, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(length, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(normalize, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(normalized, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(is_normalized, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(distance_to, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(distance_squared_to, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(direction_to, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(abs, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(sign, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(floor, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(ceil, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(round, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(lerp, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(cubic_interpolate, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(cubic_interpolate_in_time, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(posmod, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(posmodv, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(snap, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(snapped, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(clamp, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(inverse, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(dot, Self)
+	
+};
 
 } // namespace godot
 

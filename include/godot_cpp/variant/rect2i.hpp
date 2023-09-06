@@ -31,6 +31,7 @@
 #ifndef GODOT_RECT2I_HPP
 #define GODOT_RECT2I_HPP
 
+#include <godot_cpp/classes/properties.hpp>
 #include <godot_cpp/classes/global_constants.hpp>
 #include <godot_cpp/variant/vector2i.hpp>
 
@@ -242,6 +243,37 @@ struct _NO_DISCARD_ Rect2i {
 			position(p_pos),
 			size(p_size) {
 	}
+};
+
+template <auto Getter, auto Setter> PROPERTY_TEMPLATE_CONSTRAINT(Getter, Setter)
+class Property<Rect2i, Getter, Setter> : public PropertyOperations<Property<Rect2i, Getter, Setter>> {
+    using T = Rect2i;
+    using Self = Property<Rect2i, Getter, Setter>;
+public:
+	PROPERTY_CORE(Getter, Setter)
+
+	GODOT_PROPERTY_WRAPPED_PROPERTY(Point2i, position, Self)
+	GODOT_PROPERTY_WRAPPED_PROPERTY(Size2i, size, Self)
+
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_area, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_center, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(intersects, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(encloses, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(has_area, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(intersection, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(merge, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(has_point, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(grow, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(grow_side, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(grow_side_bind, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(grow_individual, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(expand, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(expand_to, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(abs, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(set_end, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_end, Self)
+	GODOT_PROPERTY_WRAPPED_PROPERTY_NO_GET_SET(Vector2i, end, Self)
+
 };
 
 } // namespace godot

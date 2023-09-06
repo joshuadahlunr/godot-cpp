@@ -31,6 +31,7 @@
 #ifndef GODOT_TRANSFORM2D_HPP
 #define GODOT_TRANSFORM2D_HPP
 
+#include <godot_cpp/classes/properties.hpp>
 #include <godot_cpp/variant/packed_vector2_array.hpp>
 #include <godot_cpp/variant/rect2.hpp>
 #include <godot_cpp/variant/vector2.hpp>
@@ -56,6 +57,14 @@ struct _NO_DISCARD_ Transform2D {
 	_FORCE_INLINE_ real_t tdotx(const Vector2 &v) const { return columns[0][0] * v.x + columns[1][0] * v.y; }
 	_FORCE_INLINE_ real_t tdoty(const Vector2 &v) const { return columns[0][1] * v.x + columns[1][1] * v.y; }
 
+	Vector2 get_x() const { return columns[0]; }
+	Vector2 set_x(Vector2 value) { return columns[0] = value; }
+	godot::Property<Vector2, &Transform2D::get_x, &Transform2D::set_x> x() { return this; }
+
+	Vector2 get_y() const { return columns[1]; }
+	Vector2 set_y(Vector2 value) { return columns[1] = value; }
+	godot::Property<Vector2, &Transform2D::get_y, &Transform2D::set_y> y() { return this; }
+
 	const Vector2 &operator[](int p_idx) const { return columns[p_idx]; }
 	Vector2 &operator[](int p_idx) { return columns[p_idx]; }
 
@@ -67,8 +76,12 @@ struct _NO_DISCARD_ Transform2D {
 
 	void set_rotation(const real_t p_rot);
 	real_t get_rotation() const;
+	godot::Property<real_t, &Transform2D::get_rotation, &Transform2D::set_rotation> rotation() { return this; }
+
 	real_t get_skew() const;
 	void set_skew(const real_t p_angle);
+	godot::Property<real_t, &Transform2D::get_skew, &Transform2D::set_skew> skew() { return this; }
+	
 	_FORCE_INLINE_ void set_rotation_and_scale(const real_t p_rot, const Size2 &p_scale);
 	_FORCE_INLINE_ void set_rotation_scale_and_skew(const real_t p_rot, const Size2 &p_scale, const real_t p_skew);
 	void rotate(const real_t p_angle);
@@ -85,6 +98,7 @@ struct _NO_DISCARD_ Transform2D {
 
 	_FORCE_INLINE_ const Vector2 &get_origin() const { return columns[2]; }
 	_FORCE_INLINE_ void set_origin(const Vector2 &p_origin) { columns[2] = p_origin; }
+	godot::Property<Vector2, &Transform2D::get_origin, &Transform2D::set_origin> origin() { return this; }
 
 	Transform2D basis_scaled(const Size2 &p_scale) const;
 	Transform2D scaled(const Size2 &p_scale) const;
@@ -244,6 +258,82 @@ PackedVector2Array Transform2D::xform_inv(const PackedVector2Array &p_array) con
 	}
 	return array;
 }
+
+template <auto Getter, auto Setter> PROPERTY_TEMPLATE_CONSTRAINT(Getter, Setter)
+class Property<Transform2D, Getter, Setter> : public PropertyOperations<Property<Transform2D, Getter, Setter>> {
+    using T = Transform2D;
+    using Self = Property<Transform2D, Getter, Setter>;
+public:
+	PROPERTY_CORE(Getter, Setter)
+
+	GODOT_PROPERTY_WRAPPED_PROPERTY(Vector2*, columns, Self)
+
+	Vector2 get_x() const { return get_columns()[0]; }
+	Vector2 get_y() const { return get_columns()[1]; }
+
+	Vector2 set_x(Vector2 value) {
+		auto temp = get_columns();
+		temp[0] = value;
+		set_columns(temp);
+		return temp;
+	}
+	Vector2 set_y(Vector2 value) {
+		auto temp = get_columns();
+		temp[1] = value;
+		set_columns(temp);
+		return temp;
+	}
+
+	GODOT_PROPERTY_WRAPPED_PROPERTY_NO_GET_SET(Vector2, x, Self)
+	GODOT_PROPERTY_WRAPPED_PROPERTY_NO_GET_SET(Vector2, y, Self)
+
+	GODOT_PROPERTY_WRAPPED_FUNCTION(tdotx, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(tdoty, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(invert, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(inverse, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(affine_invert, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(affine_inverse, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(set_rotation, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_rotation, Self)
+	GODOT_PROPERTY_WRAPPED_PROPERTY_NO_GET_SET(real_t, rotation, Self);
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_skew, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(set_skew, Self)
+	GODOT_PROPERTY_WRAPPED_PROPERTY_NO_GET_SET(real_t, skew, Self);
+	GODOT_PROPERTY_WRAPPED_FUNCTION(set_rotation_and_scale, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(set_rotation_scale_and_skew, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(rotate, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(scale, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(scale_basis, Self)
+	template<typename... Args> requires (getsetable<Self>) void translate_local(Args... args) { auto temp = get(); temp.translate_local(std::forward<Args>(args)...); set(temp); }
+	template<typename... Args> requires (!getsetable<Self> && getable<Self>) void translate_local(Args... args) const { const auto temp = get(); temp.translate_local(std::forward<Args>(args)...); }
+	GODOT_PROPERTY_WRAPPED_FUNCTION(basis_determinant, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_scale, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(set_scale, Self)
+	GODOT_PROPERTY_WRAPPED_PROPERTY_NO_GET_SET(Size2, scale, Self);
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_origin, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(set_origin, Self)
+	GODOT_PROPERTY_WRAPPED_PROPERTY_NO_GET_SET(Vector2, origin, Self);
+	GODOT_PROPERTY_WRAPPED_FUNCTION(basis_scaled, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(scaled, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(scaled_local, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(translated, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(translated_local, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(rotated, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(rotated_local, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(untranslated, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(orthonormalize, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(orthonormalized, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(is_equal_approx, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(looking_at, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(interpolate_with, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(basis_xform, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(basis_xform_inv, Self)
+	template<typename... Args> requires (getsetable<Self> ) auto xform(Args... args) { auto temp = get(); auto ret = temp.xform(std::forward<Args>(args)...); set(temp); return ret; }
+	template<typename... Args> requires (!getsetable<Self> && getable<Self>) auto xform(Args... args) const { const auto temp = get(); auto ret = temp.xform(std::forward<Args>(args)...); return ret; }
+	template<typename... Args> requires (getsetable<Self> ) auto xform_inv(Args... args) { auto temp = get(); auto ret = temp.xform_inv(std::forward<Args>(args)...); set(temp); return ret; }
+	template<typename... Args> requires (!getsetable<Self> && getable<Self>) auto xform_inv(Args... args) const { const auto temp = get(); auto ret = temp.xform_inv(std::forward<Args>(args)...); return ret; }
+
+};
 
 } // namespace godot
 

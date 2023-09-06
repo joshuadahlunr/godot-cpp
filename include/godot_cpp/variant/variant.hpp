@@ -32,6 +32,7 @@
 #define GODOT_VARIANT_HPP
 
 #include <godot_cpp/core/defs.hpp>
+#include <godot_cpp/classes/properties.hpp>
 
 #include <godot_cpp/variant/builtin_types.hpp>
 #include <godot_cpp/variant/variant_size.hpp>
@@ -353,6 +354,47 @@ String vformat(const String &p_text, const VarArgs... p_args) {
 
 	return p_text % args_array;
 }
+
+template <auto Getter, auto Setter> PROPERTY_TEMPLATE_CONSTRAINT(Getter, Setter)
+class Property<Variant, Getter, Setter> : public PropertyOperations<Property<Variant, Getter, Setter>> {
+    using T = Variant;
+    using Self = Property<Variant, Getter, Setter>;
+public:
+	PROPERTY_CORE(Getter, Setter)
+
+	// GODOT_PROPERTY_WRAPPED_FUNCTION(call, Self)
+	// GODOT_PROPERTY_WRAPPED_FUNCTION(call_static, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(evaluate, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(set, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(set_named, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(set_indexed, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(set_keyed, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_named, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_indexed, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_keyed, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(in, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(iter_init, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(iter_next, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(iter_get, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_type, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(has_method, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(has_key, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(has_member, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(hash, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(recursive_hash, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(hash_compare, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(booleanize, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(stringify, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(duplicate, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(blend, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(interpolate, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_type_name, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(can_convert, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(can_convert_strict, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(clear, Self)
+
+};
 
 #include <godot_cpp/variant/builtin_vararg_methods.hpp>
 

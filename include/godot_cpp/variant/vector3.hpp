@@ -31,6 +31,7 @@
 #ifndef GODOT_VECTOR3_HPP
 #define GODOT_VECTOR3_HPP
 
+#include <godot_cpp/classes/properties.hpp>
 #include <godot_cpp/core/error_macros.hpp>
 #include <godot_cpp/core/math.hpp>
 
@@ -523,6 +524,75 @@ Vector3 Vector3::reflect(const Vector3 &p_normal) const {
 #endif
 	return 2.0f * p_normal * this->dot(p_normal) - *this;
 }
+
+
+
+template <auto Getter, auto Setter> PROPERTY_TEMPLATE_CONSTRAINT(Getter, Setter)
+class Property<Vector3, Getter, Setter> : public PropertyOperations<Property<Vector3, Getter, Setter>> {
+    using T = Vector3;
+    using Self = Property<Vector3, Getter, Setter>;
+public:
+	PROPERTY_CORE(Getter, Setter)
+
+	GODOT_PROPERTY_WRAPPED_PROPERTY(real_t, x, Self)
+	GODOT_PROPERTY_WRAPPED_PROPERTY(real_t, y, Self)
+	GODOT_PROPERTY_WRAPPED_PROPERTY(real_t, z, Self)
+
+	// real_t get_x() const requires getable<Self> { return get().x; }
+	// real_t set_x(real_t value) requires getsetable<Self> { auto temp = get(); temp.x = value; set(temp); return temp.x; }
+	// Property<real_t, &Self::get_x, &Self::set_x> x() requires getsetable<Self> { return this; }
+	// Property<real_t, &Self::get_x> x() requires (!getsetable<Self> && getable<Self>) { return this; }
+	// Property<real_t, nullptr, &Self::set_x> x() requires (!getsetable<Self> && setable<Self>) { return this; }
+	// const Property<real_t, &Self::get_x, &Self::set_x> x() const requires getsetable<Self> { return this; }
+	// const Property<real_t, &Self::get_x> x() const requires (!getsetable<Self> && getable<Self>) { return this; }
+
+	GODOT_PROPERTY_WRAPPED_FUNCTION(min_axis_index, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(max_axis_index, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(length, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(length_squared, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(normalize, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(normalized, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(is_normalized, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(inverse, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(limit_length, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(zero, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(snap, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(snapped, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(rotate, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(rotated, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(lerp, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(slerp, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(cubic_interpolate, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(cubic_interpolate_in_time, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(bezier_interpolate, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(move_toward, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(octahedron_encode, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(octahedron_decode, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(octahedron_tangent_encode, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(octahedron_tangent_decode, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(cross, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(dot, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(outer, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(abs, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(floor, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(sign, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(ceil, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(round, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(clamp, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(distance_to, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(distance_squared_to, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(posmod, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(posmodv, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(project, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(angle_to, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(signed_angle_to, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(direction_to, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(slide, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(bounce, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(reflect, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(is_equal_approx, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(is_zero_approx, Self)
+};
 
 } // namespace godot
 

@@ -31,6 +31,7 @@
 #ifndef GODOT_RECT2_HPP
 #define GODOT_RECT2_HPP
 
+#include <godot_cpp/classes/properties.hpp>
 #include <godot_cpp/classes/global_constants.hpp>
 #include <godot_cpp/variant/vector2.hpp>
 
@@ -369,6 +370,44 @@ struct _NO_DISCARD_ Rect2 {
 			position(p_pos),
 			size(p_size) {
 	}
+};
+
+template <auto Getter, auto Setter> PROPERTY_TEMPLATE_CONSTRAINT(Getter, Setter)
+class Property<Rect2, Getter, Setter> : public PropertyOperations<Property<Rect2, Getter, Setter>> {
+    using T = Rect2;
+    using Self = Property<Rect2, Getter, Setter>;
+public:
+	PROPERTY_CORE(Getter, Setter)
+
+	GODOT_PROPERTY_WRAPPED_PROPERTY(Point2, position, Self)
+	GODOT_PROPERTY_WRAPPED_PROPERTY(Size2, size, Self)
+
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_area, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_center, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(intersects, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(distance_to, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(intersects_transformed, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(intersects_segment, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(encloses, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(has_area, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(intersection, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(merge, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(has_point, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(is_equal_approx, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(grow, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(grow_by, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(grow_side, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(grow_side_bind, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(grow_individual, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(expand, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(expand_to, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(abs, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_support, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(intersects_filled_polygon, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(set_end, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_end, Self)
+	GODOT_PROPERTY_WRAPPED_PROPERTY_NO_GET_SET(Vector2, end, Self)
+
 };
 
 } // namespace godot

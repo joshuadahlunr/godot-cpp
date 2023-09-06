@@ -31,6 +31,7 @@
 #ifndef GODOT_PLANE_HPP
 #define GODOT_PLANE_HPP
 
+#include <godot_cpp/classes/properties.hpp>
 #include <godot_cpp/classes/global_constants.hpp>
 #include <godot_cpp/variant/vector3.hpp>
 
@@ -44,6 +45,19 @@ struct _NO_DISCARD_ Plane {
 
 	void set_normal(const Vector3 &p_normal);
 	_FORCE_INLINE_ Vector3 get_normal() const { return normal; }
+
+	float get_x() const { return normal.x; }
+	float set_x(float value) { return normal.x = value; }
+	godot::Property<float, &Plane::get_x, &Plane::set_x> x() { return this; }
+
+	float get_y() const { return normal.y; }
+	float set_y(float value) { return normal.y = value; }
+	godot::Property<float, &Plane::get_y, &Plane::set_y> y() { return this; }
+
+	float get_z() const { return normal.z; }
+	float set_z(float value) { return normal.z = value; }
+	godot::Property<float, &Plane::get_z, &Plane::set_z> z() { return this; }
+
 
 	void normalize();
 	Plane normalized() const;
@@ -134,6 +148,62 @@ bool Plane::operator==(const Plane &p_plane) const {
 bool Plane::operator!=(const Plane &p_plane) const {
 	return normal != p_plane.normal || d != p_plane.d;
 }
+
+template <auto Getter, auto Setter> PROPERTY_TEMPLATE_CONSTRAINT(Getter, Setter)
+class Property<Plane, Getter, Setter> : public PropertyOperations<Property<Plane, Getter, Setter>> {
+    using T = Plane;
+    using Self = Property<Plane, Getter, Setter>;
+public:
+	PROPERTY_CORE(Getter, Setter)
+
+	float get_x() const { return get_normal().x; }
+	float get_y() const { return get_normal().y; }
+	float get_z() const { return get_normal().z; }
+
+	float set_x(float value) {
+		auto temp = get_normal();
+		temp.x = value;
+		set_normal(temp);
+		return temp.x;
+	}
+	float set_y(float value) {
+		auto temp = get_normal();
+		temp.y = value;
+		set_normal(temp);
+		return temp.y;
+	}
+	float set_z(float value) {
+		auto temp = get_normal();
+		temp.z = value;
+		set_normal(temp);
+		return temp.z;
+	}
+
+	GODOT_PROPERTY_WRAPPED_PROPERTY_NO_GET_SET(float, x, Self);
+	GODOT_PROPERTY_WRAPPED_PROPERTY_NO_GET_SET(float, y, Self);
+	GODOT_PROPERTY_WRAPPED_PROPERTY_NO_GET_SET(float, z, Self);
+
+	GODOT_PROPERTY_WRAPPED_PROPERTY(Vector3, normal, Self)
+	GODOT_PROPERTY_WRAPPED_PROPERTY(real_t, d, Self)
+
+	GODOT_PROPERTY_WRAPPED_FUNCTION(normalize, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(normalized, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(center, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(get_any_perpendicular_normal, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(is_point_over, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(distance_to, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(has_point, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(intersect_3, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(intersects_ray, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(intersects_segment, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(intersect_3_bind, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(intersects_ray_bind, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(intersects_segment_bind, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(project, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(is_equal_approx, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(is_equal_approx_any_side, Self)
+
+};
 
 } // namespace godot
 

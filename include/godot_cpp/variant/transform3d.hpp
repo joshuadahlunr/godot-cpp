@@ -31,6 +31,7 @@
 #ifndef GODOT_TRANSFORM3D_HPP
 #define GODOT_TRANSFORM3D_HPP
 
+#include <godot_cpp/classes/properties.hpp>
 #include <godot_cpp/core/math.hpp>
 #include <godot_cpp/variant/aabb.hpp>
 #include <godot_cpp/variant/basis.hpp>
@@ -269,6 +270,50 @@ _FORCE_INLINE_ Plane Transform3D::xform_inv_fast(const Plane &p_plane, const Tra
 	real_t d = normal.dot(point);
 	return Plane(normal, d);
 }
+
+template <auto Getter, auto Setter> PROPERTY_TEMPLATE_CONSTRAINT(Getter, Setter)
+class Property<Transform3D, Getter, Setter> : public PropertyOperations<Property<Transform3D, Getter, Setter>> {
+    using T = Transform3D;
+    using Self = Property<Transform3D, Getter, Setter>;
+public:
+	PROPERTY_CORE(Getter, Setter)
+
+	GODOT_PROPERTY_WRAPPED_PROPERTY(Basis, basis, Self)
+	GODOT_PROPERTY_WRAPPED_PROPERTY(Vector3, origin, Self)
+
+	GODOT_PROPERTY_WRAPPED_FUNCTION(invert, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(inverse, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(affine_invert, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(affine_inverse, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(rotated, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(rotated_local, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(rotate, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(rotate_basis, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(set_look_at, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(looking_at, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(scale, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(scaled, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(scaled_local, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(scale_basis, Self)
+	template<typename... Args> requires (getsetable<Self>) void translate_local(Args... args) { auto temp = get(); temp.translate_local(std::forward<Args>(args)...); set(temp); }
+	template<typename... Args> requires (!getsetable<Self> && getable<Self>) void translate_local(Args... args) const { const auto temp = get(); temp.translate_local(std::forward<Args>(args)...); }
+	GODOT_PROPERTY_WRAPPED_FUNCTION(translated, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(translated_local, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(orthonormalize, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(orthonormalized, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(orthogonalize, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(orthogonalized, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(is_equal_approx, Self)
+	template<typename... Args> requires (getsetable<Self> ) auto xform(Args... args) { auto temp = get(); auto ret = temp.xform(std::forward<Args>(args)...); set(temp); return ret; }
+	template<typename... Args> requires (!getsetable<Self> && getable<Self>) auto xform(Args... args) const { const auto temp = get(); auto ret = temp.xform(std::forward<Args>(args)...); return ret; }
+	template<typename... Args> requires (getsetable<Self> ) auto xform_inv(Args... args) { auto temp = get(); auto ret = temp.xform_inv(std::forward<Args>(args)...); set(temp); return ret; }
+	template<typename... Args> requires (!getsetable<Self> && getable<Self>) auto xform_inv(Args... args) const { const auto temp = get(); auto ret = temp.xform_inv(std::forward<Args>(args)...); return ret; }
+	GODOT_PROPERTY_WRAPPED_FUNCTION(xform_fast, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(xform_inv_fast, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(interpolate_with, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(inverse_xform, Self)
+	
+};
 
 } // namespace godot
 

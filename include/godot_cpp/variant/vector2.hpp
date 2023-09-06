@@ -31,6 +31,7 @@
 #ifndef GODOT_VECTOR2_HPP
 #define GODOT_VECTOR2_HPP
 
+#include <godot_cpp/classes/properties.hpp>
 #include <godot_cpp/core/error_macros.hpp>
 #include <godot_cpp/core/math.hpp>
 
@@ -317,6 +318,65 @@ _FORCE_INLINE_ Vector2 operator*(const int64_t p_scalar, const Vector2 &p_vec) {
 
 typedef Vector2 Size2;
 typedef Vector2 Point2;
+
+template <auto Getter, auto Setter> PROPERTY_TEMPLATE_CONSTRAINT(Getter, Setter)
+class Property<Vector2, Getter, Setter> : public PropertyOperations<Property<Vector2, Getter, Setter>> {
+    using T = Vector2;
+    using Self = Property<Vector2, Getter, Setter>;
+public:
+	PROPERTY_CORE(Getter, Setter)
+
+	GODOT_PROPERTY_WRAPPED_PROPERTY(real_t, x, Self)
+	GODOT_PROPERTY_WRAPPED_PROPERTY(real_t, y, Self)
+	GODOT_PROPERTY_WRAPPED_PROPERTY(real_t, width, Self)
+	GODOT_PROPERTY_WRAPPED_PROPERTY(real_t, height, Self)
+
+	GODOT_PROPERTY_WRAPPED_FUNCTION(min_axis_index, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(max_axis_index, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(normalize, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(normalized, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(is_normalized, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(length, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(length_squared, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(limit_length, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(min, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(max, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(distance_to, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(distance_squared_to, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(angle_to, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(angle_to_point, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(direction_to, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(dot, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(cross, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(posmod, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(posmodv, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(project, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(plane_project, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(lerp, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(slerp, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(cubic_interpolate, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(cubic_interpolate_in_time, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(bezier_interpolate, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(move_toward, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(slide, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(bounce, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(reflect, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(is_equal_approx, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(is_zero_approx, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(angle, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(from_angle, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(abs, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(rotated, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(orthogonal, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(sign, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(floor, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(ceil, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(round, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(snapped, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(clamp, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(aspect, Self)
+
+};
 
 } // namespace godot
 
