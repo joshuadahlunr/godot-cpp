@@ -31,7 +31,7 @@
 #ifndef GODOT_RECT2I_HPP
 #define GODOT_RECT2I_HPP
 
-#include <godot_cpp/classes/properties.hpp>
+#include <godot_cpp/classes/property_wrappers.hpp>
 #include <godot_cpp/classes/global_constants.hpp>
 #include <godot_cpp/variant/vector2i.hpp>
 

@@ -32,7 +32,7 @@
 #define GODOT_BASIS_HPP
 
 #include <godot_cpp/classes/global_constants.hpp>
-#include <godot_cpp/classes/properties.hpp>
+#include <godot_cpp/classes/property_wrappers.hpp>
 #include <godot_cpp/variant/quaternion.hpp>
 #include <godot_cpp/variant/vector3.hpp>
 

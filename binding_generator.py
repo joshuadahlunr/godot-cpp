@@ -396,7 +396,7 @@ def generate_builtin_class_header(builtin_api, size, used_classes, fully_used_cl
 
     result.append("")
     result.append("#include <godot_cpp/core/defs.hpp>")
-    result.append("#include <godot_cpp/classes/properties.hpp>")
+    result.append("#include <godot_cpp/classes/property_wrappers.hpp>")
     result.append("")
 
     # Special cases.

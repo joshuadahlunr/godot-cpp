@@ -31,7 +31,7 @@
 #ifndef GODOT_PLANE_HPP
 #define GODOT_PLANE_HPP
 
-#include <godot_cpp/classes/properties.hpp>
+#include <godot_cpp/classes/property_wrappers.hpp>
 #include <godot_cpp/classes/global_constants.hpp>
 #include <godot_cpp/variant/vector3.hpp>
 

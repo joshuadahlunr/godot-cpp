@@ -76,7 +76,7 @@ public:
 	};                                                                                                           \
 \
 	template <auto Getter, auto Setter> PROPERTY_TEMPLATE_CONSTRAINT(Getter, Setter)                             \
-	class Property<TypedArray<m_type>, Getter, Setter> : public Property<Array, Getter, Setter>/*, public PropertyOperations<Property<TypedArray<m_type>, Getter, Setter>>*/ {\
+	class Property<TypedArray<m_type>, Getter, Setter> : public Property<Array, Getter, Setter>, public PropertyOperations<Property<TypedArray<m_type>, Getter, Setter>> {\
 		using T = TypedArray<m_type>;                                                                              \
 		using Self = Property<TypedArray<m_type>, Getter, Setter>;                                                 \
 	public:                                                                                                      \

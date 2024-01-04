@@ -31,7 +31,7 @@
 #ifndef GODOT_COLOR_HPP
 #define GODOT_COLOR_HPP
 
-#include <godot_cpp/classes/properties.hpp>
+#include <godot_cpp/classes/property_wrappers.hpp>
 #include <godot_cpp/core/math.hpp>
 
 namespace godot {

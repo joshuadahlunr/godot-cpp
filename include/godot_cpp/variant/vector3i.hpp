@@ -31,7 +31,7 @@
 #ifndef GODOT_VECTOR3I_HPP
 #define GODOT_VECTOR3I_HPP
 
-#include <godot_cpp/classes/properties.hpp>
+#include <godot_cpp/classes/property_wrappers.hpp>
 #include <godot_cpp/core/error_macros.hpp>
 #include <godot_cpp/core/math.hpp>
 

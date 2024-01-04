@@ -32,7 +32,7 @@
 #define GODOT_VARIANT_HPP
 
 #include <godot_cpp/core/defs.hpp>
-#include <godot_cpp/classes/properties.hpp>
+#include <godot_cpp/classes/property_wrappers.hpp>
 
 #include <godot_cpp/variant/builtin_types.hpp>
 #include <godot_cpp/variant/variant_size.hpp>

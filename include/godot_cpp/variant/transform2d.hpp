@@ -31,7 +31,7 @@
 #ifndef GODOT_TRANSFORM2D_HPP
 #define GODOT_TRANSFORM2D_HPP
 
-#include <godot_cpp/classes/properties.hpp>
+#include <godot_cpp/classes/property_wrappers.hpp>
 #include <godot_cpp/variant/packed_vector2_array.hpp>
 #include <godot_cpp/variant/rect2.hpp>
 #include <godot_cpp/variant/vector2.hpp>

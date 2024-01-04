@@ -32,6 +32,7 @@
 #define GODOT_REF_HPP
 
 #include <godot_cpp/core/defs.hpp>
+#include <godot_cpp/classes/property_wrappers.hpp>
 
 #include <godot_cpp/classes/object.hpp>
 #include <godot_cpp/classes/ref_counted.hpp>
@@ -280,6 +281,29 @@ struct GetTypeInfo<const Ref<T> &, typename EnableIf<TypeInherits<RefCounted, T>
 
 	static inline PropertyInfo get_class_info() {
 		return make_property_info(Variant::Type::OBJECT, "", PROPERTY_HINT_RESOURCE_TYPE, T::get_class_static());
+	}
+};
+
+template <class T0, auto Getter, auto Setter> PROPERTY_TEMPLATE_CONSTRAINT(Getter, Setter)
+class Property<Ref<T0>, Getter, Setter> : public PropertyOperations<Property<Ref<T0>, Getter, Setter>> {
+    using T = Ref<T0>;
+    using Self = Property<Ref<T0>, Getter, Setter>;
+public:
+	PROPERTY_CORE(Getter, Setter)
+
+	GODOT_PROPERTY_WRAPPED_FUNCTION(ptr, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(reference_ptr, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(is_valid, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(is_null, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(unref, Self)
+	GODOT_PROPERTY_WRAPPED_FUNCTION(instantiate, Self)
+
+	_FORCE_INLINE_ T0 *operator*() const {
+		return ptr();
+	}
+
+	_FORCE_INLINE_ T0 *operator->() const {
+		return ptr();
 	}
 };
 
