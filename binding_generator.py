@@ -2070,6 +2070,11 @@ def generate_property_version(api, listed_methods=None):
             if "is_static" in method and method["is_static"]: continue
             if method["name"] == "get_node": continue
             name = method["name"] if method["name"] != "new" else method["name"] + "_"
+
+            # Need manual implementations
+            if (class_name in ["BitMap", "ImageTexture3D"]) and method["name"] == "create":
+                result.append("\ttemplate<typename... Args>\r\n\tvoid create(Args... args) {\r\n\t\tstatic_assert(getable<Self>, \"Trying to call a wrapped function on a set only property!\");\\\r\n\r\n\t\tauto temp = get();\r\n\t\ttemp.create(std::forward<Args>(args)...);\r\n\t\tif constexpr (setable<Self>) set(temp);\r\n\t}\r\n\ttemplate<typename... Args>\r\n\tvoid create(Args... args) const {\r\n\t\tstatic_assert(getable<Self>, \"Trying to call a wrapped function on a set only property!\");\r\n\t\tget().create(std::forward<Args>(args)...);\r\n\t}")
+                continue
             
             methods = list((m for m in api["methods"] if m['name'] == method['name']))
             if len(methods) > 1\
