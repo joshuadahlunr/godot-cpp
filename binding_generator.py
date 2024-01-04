@@ -396,6 +396,7 @@ def generate_builtin_class_header(builtin_api, size, used_classes, fully_used_cl
 
     result.append("")
     result.append("#include <godot_cpp/core/defs.hpp>")
+    result.append("#include <godot_cpp/classes/properties.hpp>")
     result.append("")
 
     # Special cases.
@@ -773,6 +774,8 @@ def generate_builtin_class_header(builtin_api, size, used_classes, fully_used_cl
         result.append("String uitos(uint64_t p_val);")
         result.append("String rtos(double p_val);")
         result.append("String rtoss(double p_val);")
+
+    result.extend(generate_property_version(builtin_api))
 
     result.append("")
     result.append("} // namespace godot")
@@ -1267,9 +1270,11 @@ def generate_engine_classes_bindings(api, output_dir, use_template_get_node):
         with header_filename.open("w+", encoding="utf-8") as header_file:
             header_file.write("\n".join(result))
 
+property_helper_definitions = ""
 
 def generate_engine_class_header(class_api, used_classes, fully_used_classes, use_template_get_node):
     global singletons
+    global property_helper_definitions
     result = []
 
     class_name = class_api["name"]
@@ -1350,6 +1355,8 @@ def generate_engine_class_header(class_api, used_classes, fully_used_classes, us
         result.append(f"\tstatic {class_name} *get_singleton();")
         result.append("")
 
+    listed_methods = set()
+
     if "methods" in class_api:
         for method in class_api["methods"]:
             if method["is_virtual"]:
@@ -1370,6 +1377,8 @@ def generate_engine_class_header(class_api, used_classes, fully_used_classes, us
                 # Add templated version.
                 result += make_varargs_template(method)
 
+            listed_methods.add(method["name"])
+
         # Virtuals now.
         for method in class_api["methods"]:
             if not method["is_virtual"]:
@@ -1380,6 +1389,52 @@ def generate_engine_class_header(class_api, used_classes, fully_used_classes, us
                 class_name, method, for_header=True, use_template_get_node=use_template_get_node
             )
             result.append(method_signature + ";")
+
+            listed_methods.add(method["name"])
+
+    listed_methods = list(listed_methods)
+    property_helper_definitions = []
+    
+    if "properties" in class_api:
+        for prop in class_api["properties"]:
+            if prop["name"] in listed_methods: continue
+            if re.search(r'_\d+$', prop["name"]): continue # Skip any name that ends with _#
+            name = prop["name"] if prop["name"] not in "operator" else prop["name"] + "_"
+            getter = "nullptr"
+            setter = "nullptr"
+            prop_type = cleanup_property_type(prop['type'])
+            if "getter" in prop:
+                if not prop["getter"] in listed_methods: continue
+                getter = f"&{class_name}::{prop['getter']}"
+                method_data = next((m for m in class_api["methods"] if m['name'] == prop['getter']), None)
+                return_type = method_data["return_value"]["type"]
+                return_meta = method_data["return_value"]["meta"] if "meta" in method_data["return_value"] else None
+                prop_type = cleanup_property_type(correct_type(return_type, return_meta))
+            if "setter" in prop:
+                if not prop["setter"] in listed_methods: continue
+                setter = f"&{class_name}::{prop['setter']}"
+
+            if "index" in prop:
+                result.append("protected:")
+                if "getter" in prop:
+                    method_data = next((m for m in class_api["methods"] if m['name'] == prop['getter']), None)
+                    index_type = cleanup_property_type(method_data["arguments"][0]["type"])
+
+                    property_helper_definitions.append(f"{prop_type} {class_name}::get_{name}() {{ return {prop['getter']}(({index_type}){prop['index']}); }}")
+                    result.append(f"\t{prop_type} get_{name}();")
+                    getter = f"&{class_name}::get_{name}"
+                if "setter" in prop:
+                    method_data = next((m for m in class_api["methods"] if m['name'] == prop['setter']), None)
+                    index_type = cleanup_property_type(method_data["arguments"][0]["type"])
+
+                    property_helper_definitions.append(f"{prop_type} {class_name}::set_{name}({prop_type} value) {{ {prop['setter']}(({index_type}){prop['index']}, value); return value; }}")
+                    result.append(f"\t{prop_type} set_{name}({prop_type} value);")
+                    setter = f"&{class_name}::set_{name}"
+                result.append("public:")
+                # continue
+            
+            result.append(f"\tProperty<{prop_type}, {getter}, {setter}> {name}() {{ return this; }}")
+            # print(f"{class_name} has {prop}!")
 
     result.append("protected:")
     # T is the custom class we want to register (from which the call initiates, going up the inheritance chain),
@@ -1448,6 +1503,9 @@ def generate_engine_class_header(class_api, used_classes, fully_used_classes, us
     result.append("};")
     result.append("")
 
+    result.extend(generate_property_version(class_api, listed_methods))
+
+    result.append("")
     result.append("} // namespace godot")
     result.append("")
 
@@ -1511,6 +1569,7 @@ def generate_engine_class_header(class_api, used_classes, fully_used_classes, us
 
 def generate_engine_class_source(class_api, used_classes, fully_used_classes, use_template_get_node):
     global singletons
+    global property_helper_definitions
     result = []
 
     class_name = class_api["name"]
@@ -1665,6 +1724,9 @@ def generate_engine_class_source(class_api, used_classes, fully_used_classes, us
                 method_signature += "}"
                 result.append(method_signature)
             result.append("")
+
+    result.extend(property_helper_definitions)
+    property_helper_definitions = []
 
     result.append("")
     result.append("} // namespace godot ")
@@ -1942,7 +2004,92 @@ def generate_utility_functions(api, output_dir):
         source_file.write("\n".join(source))
 
 
+def generate_property_version(api, listed_methods=None):
+    result = []
+    for i in range(0, 3): result.append("")
+
+    class_name = api["name"]
+    snake_class_name = camel_to_snake(class_name).upper()
+
+    if "inherits" in api:
+        result.append("template <auto Getter, auto Setter> PROPERTY_TEMPLATE_CONSTRAINT(Getter, Setter)")
+        result.append(f"class Property<{class_name}, Getter, Setter> : public Property<{api['inherits']}, Getter, Setter>, public PropertyOperations<Property<{class_name}, Getter, Setter>> {{")
+        result.append(f"\tusing T = {class_name};")
+        result.append(f"\tusing Self = Property<{class_name}, Getter, Setter>;")
+        result.append("public:")
+        result.append("\tPROPERTY_CORE(Getter, Setter)")
+        result.append("")
+    else:
+        result.append("template <auto Getter, auto Setter> PROPERTY_TEMPLATE_CONSTRAINT(Getter, Setter)")
+        result.append(f"class Property<{class_name}, Getter, Setter> : public PropertyOperations<Property<{class_name}, Getter, Setter>> {{")
+        result.append(f"\tusing T = {class_name};")
+        result.append(f"\tusing Self = Property<{class_name}, Getter, Setter>;")
+        result.append("public:")
+        result.append("\tPROPERTY_CORE(Getter, Setter)")
+        result.append("")
+
+
+
+    if "members" in api:
+        for member in api["members"]:
+            result.append(f"\tGODOT_PROPERTY_WRAPPED_PROPERTY({member['meta']}, {member['member']}, Self)")
+            print(f"member: {member}")
+
+    if "properties" in api:
+        result.append("")
+
+        for prop in api["properties"]:
+            prop_type = prop["type"]
+            if "getter" in prop and "methods" in api:
+                if listed_methods is not None and prop["getter"] not in listed_methods: continue
+                method_data = next((m for m in api["methods"] if m['name'] == prop['getter']), None)
+                if method_data is not None:
+                    return_type = method_data["return_value"]["type"]
+                    return_meta = method_data["return_value"]["meta"] if "meta" in method_data["return_value"] else None
+                    prop_type = cleanup_property_type(correct_type(return_type, return_meta))
+
+            name = prop["name"] if prop["name"] != "operator" else prop["name"] + "_"
+            result.append(f"\tGODOT_PROPERTY_WRAPPED_PROPERTY_CALL({cleanup_property_type(prop_type)}, {name}, Self)")
+
+    if "methods" in api:
+        result.append("")
+
+        for method in api["methods"]:
+            if "is_static" in method and method["is_static"]: continue
+            if method["name"] == "get_node": continue
+            name = method["name"] if method["name"] != "new" else method["name"] + "_"
+            
+            methods = list((m for m in api["methods"] if m['name'] == method['name']))
+            if len(methods) > 1\
+                or method["name"] in ["get_singleton", "store_buffer", "get_buffer"]\
+                or "is_vararg" in method and method["is_vararg"]:
+
+                type_ = "void"
+                if "return_value" in method: 
+                    if "return_meta" in method["return_value"]: type_ = correct_type(method["return_value"]["type"], method["return_value"]["return_meta"])
+                    else: type_ = correct_type(method["return_value"]["type"])
+                elif "return_type" in method: type_ = correct_type(method["return_type"])
+                if type_ == "void":
+                    result.append(f"\ttemplate<typename... Args> requires (getsetable<Self>) void {name}(Args... args) {{ auto temp = get(); temp.{name}(std::forward<Args>(args)...); set(temp); }}")
+                    result.append(f"\ttemplate<typename... Args> requires (!getsetable<Self> && getable<Self>) void {name}(Args... args) const {{ const auto temp = get(); temp.{name}(std::forward<Args>(args)...); }}")
+                else:
+                    result.append(f"\ttemplate<typename... Args> requires (getsetable<Self>) auto {name}(Args... args) {{ auto temp = get(); auto ret = temp.{name}(std::forward<Args>(args)...); set(temp); return ret; }}")
+                    result.append(f"\ttemplate<typename... Args> requires (!getsetable<Self> && getable<Self>) auto {name}(Args... args) const {{ const auto temp = get(); auto ret = temp.{name}(std::forward<Args>(args)...); return ret; }}")
+            else: result.append(f"\tGODOT_PROPERTY_WRAPPED_FUNCTION({name}, Self)")
+
+    result.append("")
+    result.append("};")
+
+    return result
+
+
 # Helper functions.
+
+
+def cleanup_property_type(prop_type):
+    if "enum::" in prop_type:
+        prop_type = prop_type[6:].replace(".", "::")
+    return prop_type
 
 
 def camel_to_snake(name):

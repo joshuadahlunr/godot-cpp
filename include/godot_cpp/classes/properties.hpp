@@ -47,13 +47,13 @@ namespace detail {
 	struct IsMemberFunction<F> { static constexpr bool value = true; };
 
     template<auto F>
-	struct IsMethodConst : public std::false_type {};
+	struct IsMethodConst { static constexpr bool value = false; };
 
-	template<typename Object, typename Ret, typename Arg0, typename... Args, Ret (Object::*F)(Arg0, Args...)>
-	struct IsMethodConst<F> : public std::false_type {};
+	template<typename Object, typename Ret, typename... Args, Ret (Object::*F)(Args...)>
+	struct IsMethodConst<F> { static constexpr bool value = false; };
 
-	template<typename Object, typename Ret, typename Arg0, typename... Args, Ret (Object::*F)(Arg0, Args...) const>
-	struct IsMethodConst<F> : public std::true_type {};
+	template<typename Object, typename Ret, typename... Args, Ret (Object::*F)(Args...) const>
+	struct IsMethodConst<F> { static constexpr bool value = true; };
 } // detail
 
 template<typename T>
@@ -231,20 +231,21 @@ struct PropertyOperations {
 	static constexpr bool hasSetter = !std::is_same_v<decltype(Setter), std::nullptr_t>;\
 	static constexpr bool setterReturns = !std::is_same_v<typename godot::detail::ReturnType<Setter>::type, void>;\
 	static_assert(hasGetter || hasSetter, "Properties must have at least a getter or a setter!");\
-	static_assert(!hasGetter || std::is_same_v<std::remove_cvref_t<typename godot::detail::ReturnType<Getter>::type>, T>, "The getter function must return T");\
-	static_assert(!hasSetter || std::is_same_v<std::remove_cvref_t<typename godot::detail::FirstArgumentType<Setter>::type>, T>, "The setter function must take a T as its first argument");\
-	static_assert(!hasGetter || !hasSetter || std::is_same_v<typename godot::detail::ObjectType<Getter>::type, typename godot::detail::ObjectType<Setter>::type>, "The getter and setter must belong to the same class!");\
+	static_assert(!hasGetter || std::is_convertible_v<std::remove_cvref_t<std::remove_cvref_t<typename godot::detail::ReturnType<Getter>::type>>, T>, "The getter function must return T");\
+	static_assert(!hasSetter || std::is_convertible_v<std::remove_cvref_t<std::remove_cvref_t<typename godot::detail::FirstArgumentType<Setter>::type>>, T>, "The setter function must take a T as its first argument");\
+	static_assert(!hasGetter || !hasSetter || std::is_convertible_v<typename godot::detail::ObjectType<Getter>::type, typename godot::detail::ObjectType<Setter>::type>, "The getter and setter must belong to the same class!");\
 \
 protected:\
 	using SetterReturn = typename godot::detail::ReturnType<Setter>::type;\
-	using Object = std::conditional_t<hasGetter, typename godot::detail::ObjectType<Getter>::type, std::conditional_t<hasSetter, typename godot::detail::ObjectType<Setter>::type, void>>;\
-	Object* object;\
+	using Object__ = std::conditional_t<hasGetter, typename godot::detail::ObjectType<Getter>::type, std::conditional_t<hasSetter, typename godot::detail::ObjectType<Setter>::type, void>>;\
+	Object__* object;\
 \
 public:\
-	Property(Object* me) : object(me) {}\
+	Property(Object__* me) : object(me) { }\
 \
-	template<bool assert = false>\
-	Property() { static_assert(assert, "Properties must be pointed at an instance of the class their getter/setter is apart of."); }\
+	/*template<>\
+	Property() { static_assert(!Assert, "Properties must be pointed at an instance of the class their getter/setter is apart of."); }*/\
+	Property() {}\
 \
 	auto operator()() const requires(hasGetter) {\
 		return (object->*Getter)();\
@@ -275,12 +276,11 @@ public:\
 	void operator=(T const & value) requires(hasSetter && !setterReturns) {\
 		(object->*Setter)(value);\
 	}\
+	Property<T, Getter, nullptr> make_read_only() requires(hasGetter) { return object; }\
+	Property<T, nullptr, Setter> make_write_only() requires(hasSetter) { return object; }\
 	typedef T value_type;\
-	typedef Object parent_type;
+	typedef Object__ parent_type;
 
-// TODO: Why does devolving to a read only version cause issues?
-// Property<T, Getter, nullptr> read_only() requires(hasGetter) { return object; }\
-// Property<T, nullptr, Setter> write_only() requires(hasSetter) { return object; }\
 
 
 
@@ -288,29 +288,70 @@ public:\
 	&& (detail::IsMemberFunction<Setter>::value || std::is_same_v<decltype(Setter), std::nullptr_t>)\
 )
 
-template <class T, auto Getter, auto Setter = nullptr> PROPERTY_TEMPLATE_CONSTRAINT(Getter, Setter)
+template <class T, auto Getter, auto Setter = nullptr, bool Assert = true> PROPERTY_TEMPLATE_CONSTRAINT(Getter, Setter)
 struct Property : PropertyOperations<Property<T, Getter, Setter>> {
 	PROPERTY_CORE(Getter, Setter)
 };
 
 
 // Helper that defines all the different permutations of access to a function based on if the property has a getter (and a setter) defined
-#define GODOT_PROPERTY_WRAPPED_FUNCTION(name, self) template<typename... Args> requires (getsetable<self> && !std::is_same_v<detail::ReturnType<&value_type::name>::type, void>) auto name(Args... args) { auto temp = get(); auto ret = temp.name(std::forward<Args>(args)...); set(temp); return ret; }\
-	template<typename... Args> requires (!getsetable<self> && getable<self> && !std::is_same_v<detail::ReturnType<&value_type::name>::type, void>) auto name(Args... args) const { const auto temp = get(); auto ret = temp.name(std::forward<Args>(args)...); return ret; }\
-	template<typename... Args> requires (getsetable<self> && std::is_same_v<detail::ReturnType<&value_type::name>::type, void>) void name(Args... args) { auto temp = get(); temp.name(std::forward<Args>(args)...); set(temp); }\
-	template<typename... Args> requires (!getsetable<self> && getable<self> && std::is_same_v<detail::ReturnType<&value_type::name>::type, void>) void name(Args... args) const { const auto temp = get(); temp.name(std::forward<Args>(args)...); }
+// #define GODOT_PROPERTY_WRAPPED_FUNCTION(name, self) template<typename... Args> requires (getsetable<self> && !std::is_same_v<detail::ReturnType<&value_type::name>::type, void>) auto name(Args... args) { auto temp = get(); auto ret = temp.name(std::forward<Args>(args)...); set(temp); return ret; }\
+// 	template<typename... Args> requires (!getsetable<self> && getable<self> && !std::is_same_v<detail::ReturnType<&value_type::name>::type, void>) auto name(Args... args) const { const auto temp = get(); auto ret = temp.name(std::forward<Args>(args)...); return ret; }\
+// 	template<typename... Args> requires (getsetable<self> && std::is_same_v<detail::ReturnType<&value_type::name>::type, void>) void name(Args... args) { auto temp = get(); temp.name(std::forward<Args>(args)...); set(temp); }\
+// 	template<typename... Args> requires (!getsetable<self> && getable<self> && std::is_same_v<detail::ReturnType<&value_type::name>::type, void>) void name(Args... args) const { const auto temp = get(); temp.name(std::forward<Args>(args)...); }
+#define GODOT_PROPERTY_WRAPPED_FUNCTION(name, self) template<typename... Args>\
+	auto name(Args... args) {\
+		static_assert(getable<self>, "Trying to call a wrapped function on a set only property!");\
+\
+		auto temp = get();\
+		if constexpr (std::is_same_v<godot::detail::ReturnType<&self::value_type::name>::type, void>){\
+			temp.name(std::forward<Args>(args)...);\
+			static_assert(godot::detail::IsMethodConst<&self::value_type::name>::value || setable<self>, "Trying to call a non-const function on a read only property!");\
+			if constexpr (!godot::detail::IsMethodConst<&self::value_type::name>::value && setable<self>) set(temp);\
+		} else {\
+			auto ret = temp.name(std::forward<Args>(args)...);\
+			static_assert(godot::detail::IsMethodConst<&self::value_type::name>::value || setable<self>, "Trying to call a non-const function on a read only property!");\
+			if constexpr (!godot::detail::IsMethodConst<&self::value_type::name>::value && setable<self>) set(temp);\
+			return ret;\
+		}\
+	}\
+	template<typename... Args>\
+	auto name(Args... args) const {\
+		static_assert(getable<self>, "Trying to call a wrapped function on a set only property!");\
+\
+		auto temp = get();\
+		if constexpr (std::is_same_v<godot::detail::ReturnType<&self::value_type::name>::type, void>)\
+			temp.name(std::forward<Args>(args)...);\
+		else return temp.name(std::forward<Args>(args)...);\
+	}
 
 // Helper that creates the different permutations of a property that copies if there is a getter or a setter for the parent property
-#define GODOT_PROPERTY_WRAPPED_PROPERTY_NO_GET_SET(type, name, self) Property<type, &self::get_##name, &self::set_##name> name() requires getsetable<self> { return this; }\
-	Property<type, &self::get_##name> name() requires (!getsetable<self> && getable<self>) { return this; }\
-	Property<type, nullptr, &self::set_##name> name() requires (!getsetable<self> && setable<self>) { return this; }\
-    const Property<type, &Self::get_##name, &Self::set_##name> name() const requires getsetable<Self> { return this; }\
-	const Property<type, &Self::get_##name> name() const requires (!getsetable<Self> && getable<Self>) { return this; }
+// #define GODOT_PROPERTY_WRAPPED_PROPERTY_NO_GET_SET(type, name, self) Property<type, &self::get_##name, &self::set_##name> name() requires getsetable<self> { return this; }\
+// 	Property<type, &self::get_##name> name() requires (!getsetable<self> && getable<self>) { return this; }\
+// 	Property<type, nullptr, &self::set_##name> name() requires (!getsetable<self> && setable<self>) { return this; }\
+//     const Property<type, &Self::get_##name, &Self::set_##name> name() const requires getsetable<Self> { return this; }\
+// 	const Property<type, &Self::get_##name> name() const requires (!getsetable<Self> && getable<Self>) { return this; }
+#define GODOT_PROPERTY_WRAPPED_PROPERTY_NO_GET_SET(type, name, self) auto name() {\
+	if constexpr (getsetable<self>) return Property<type, &self::get_##name, &self::set_##name>{this};\
+	else if constexpr (getable<self>) return Property<type, &self::get_##name, nullptr>{this};\
+	else if constexpr (setable<self>) return Property<type, nullptr, &self::set_##name>{this};\
+	else return Property<type, nullptr, nullptr>{this};\
+}\
+const auto name() const {\
+	if constexpr (getsetable<self> || getable<self>) return Property<type, &self::get_##name, nullptr>{this};\
+	else return Property<type, nullptr, nullptr>{this};\
+}
 
 // Helper that creates the different permutations of a property that copies if there is a getter or a setter for the parent property
 // Also defines get_name and set_name methods which get and set the property 
 #define GODOT_PROPERTY_WRAPPED_PROPERTY(type, name, self) type get_##name() const requires getable<self> { return get().name; }\
-	type set_##name(type value) requires getsetable<self> { auto temp = get(); temp.name = value; set(temp); return temp.name; }\
+	type set_##name(const type& value) requires getsetable<self> { auto temp = get(); temp.name = value; set(temp); return temp.name; }\
+	GODOT_PROPERTY_WRAPPED_PROPERTY_NO_GET_SET(type, name, self)
+
+// Helper that creates the different permutations of a property that copies if there is a getter or a setter for the parent property
+// Also defines get_name and set_name methods which get and set the property (assumes that the referenced entity is a property which needs to them be called)
+#define GODOT_PROPERTY_WRAPPED_PROPERTY_CALL(type, name, self) type get_##name() const requires getable<self> { return get().name(); }\
+	type set_##name(type value) requires getsetable<self> { auto temp = get(); temp.name() = value; set(temp); return temp.name(); }\
 	GODOT_PROPERTY_WRAPPED_PROPERTY_NO_GET_SET(type, name, self)
 
 } // namespace godot

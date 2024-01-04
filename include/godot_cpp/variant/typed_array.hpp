@@ -73,9 +73,17 @@ public:
 		_FORCE_INLINE_ TypedArray() {                                                                            \
 			set_typed(m_variant_type, StringName(), Variant());                                                  \
 		}                                                                                                        \
-	};
-
-MAKE_TYPED_ARRAY(bool, Variant::BOOL)
+	};                                                                                                           \
+\
+	template <auto Getter, auto Setter> PROPERTY_TEMPLATE_CONSTRAINT(Getter, Setter)                             \
+	class Property<TypedArray<m_type>, Getter, Setter> : public Property<Array, Getter, Setter>/*, public PropertyOperations<Property<TypedArray<m_type>, Getter, Setter>>*/ {\
+		using T = TypedArray<m_type>;                                                                              \
+		using Self = Property<TypedArray<m_type>, Getter, Setter>;                                                 \
+	public:                                                                                                      \
+		PROPERTY_CORE(Getter, Setter)                                                                            \
+	};	
+	
+MAKE_TYPED_ARRAY(bool, Variant::BOOL)   
 MAKE_TYPED_ARRAY(uint8_t, Variant::INT)
 MAKE_TYPED_ARRAY(int8_t, Variant::INT)
 MAKE_TYPED_ARRAY(uint16_t, Variant::INT)
@@ -106,7 +114,7 @@ MAKE_TYPED_ARRAY(RID, Variant::RID)
 MAKE_TYPED_ARRAY(Callable, Variant::CALLABLE)
 MAKE_TYPED_ARRAY(Signal, Variant::SIGNAL)
 MAKE_TYPED_ARRAY(Dictionary, Variant::DICTIONARY)
-MAKE_TYPED_ARRAY(Array, Variant::ARRAY)
+// MAKE_TYPED_ARRAY(Array, Variant::ARRAY)               
 MAKE_TYPED_ARRAY(PackedByteArray, Variant::PACKED_BYTE_ARRAY)
 MAKE_TYPED_ARRAY(PackedInt32Array, Variant::PACKED_INT32_ARRAY)
 MAKE_TYPED_ARRAY(PackedInt64Array, Variant::PACKED_INT64_ARRAY)
@@ -116,6 +124,24 @@ MAKE_TYPED_ARRAY(PackedStringArray, Variant::PACKED_STRING_ARRAY)
 MAKE_TYPED_ARRAY(PackedVector2Array, Variant::PACKED_VECTOR2_ARRAY)
 MAKE_TYPED_ARRAY(PackedVector3Array, Variant::PACKED_VECTOR3_ARRAY)
 MAKE_TYPED_ARRAY(PackedColorArray, Variant::PACKED_COLOR_ARRAY)
+
+template <>                                                                                                  
+class TypedArray<Array> : public Array {                                                                    
+public:                                                                                                      
+	_FORCE_INLINE_ void operator=(const Array &p_array) {                                                    
+		ERR_FAIL_COND_MSG(!is_same_typed(p_array), "Cannot assign an array with a different element type."); 
+		_ref(p_array);                                                                                       
+	}                                                                                                        
+	_FORCE_INLINE_ TypedArray(const Variant &p_variant) :                                                    
+			Array(p_variant.operator Array(), Variant::ARRAY, StringName(), Variant()) {                     
+	}                                                                                                        
+	_FORCE_INLINE_ TypedArray(const Array &p_array) :                                                        
+			Array(p_array, Variant::ARRAY, StringName(), Variant()) {                                        
+	}                                                                                                        
+	_FORCE_INLINE_ TypedArray() {                                                                            
+		set_typed(Variant::ARRAY, StringName(), Variant());                                                  
+	}                                                                                                        
+};
 
 } // namespace godot
 

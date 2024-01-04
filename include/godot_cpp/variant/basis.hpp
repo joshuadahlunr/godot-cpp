@@ -334,29 +334,36 @@ class Property<Basis, Getter, Setter> : public PropertyOperations<Property<Basis
 public:
 	PROPERTY_CORE(Getter, Setter)
 
-	GODOT_PROPERTY_WRAPPED_PROPERTY(Vector3*, rows, Self)
+	Vector3* get_rows() const { return get().rows; }
+	Vector3* set_rows(Vector3* value) {
+		auto temp = get();
+		memcpy(value, temp.rows, 3);
+		set(temp);
+		return temp.rows;
+	}
+	GODOT_PROPERTY_WRAPPED_PROPERTY_NO_GET_SET(Vector3*, rows, Self);
 
-	Vector3 get_x() const { return rows().get()[0]; }
-	Vector3 get_y() const { return rows().get()[1]; }
-	Vector3 get_z() const { return rows().get()[2]; }
+	Vector3 get_x() const { return get_rows()[0]; }
+	Vector3 get_y() const { return get_rows()[1]; }
+	Vector3 get_z() const { return get_rows()[2]; }
 
 	Vector3 set_x(Vector3 value) {
-		auto temp = rows().get();
+		auto temp = get_rows();
 		temp[0] = value;
-		rows().set(temp);
-		return temp;
+		set_rows(temp);
+		return temp[0];
 	}
 	Vector3 set_y(Vector3 value) {
-		auto temp = rows().get();
+		auto temp = get_rows();
 		temp[1] = value;
-		rows().set(temp);
-		return temp;
+		set_rows(temp);
+		return temp[1];
 	}
 	Vector3 set_z(Vector3 value) {
-		auto temp = rows().get();
+		auto temp = get_rows();
 		temp[2] = value;
-		rows().set(temp);
-		return temp;
+		set_rows(temp);
+		return temp[2];
 	}
 
 	GODOT_PROPERTY_WRAPPED_PROPERTY_NO_GET_SET(Vector3, x, Self);

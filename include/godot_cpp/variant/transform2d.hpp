@@ -266,7 +266,14 @@ class Property<Transform2D, Getter, Setter> : public PropertyOperations<Property
 public:
 	PROPERTY_CORE(Getter, Setter)
 
-	GODOT_PROPERTY_WRAPPED_PROPERTY(Vector2*, columns, Self)
+	Vector2* get_columns() const { return get().columns; }
+	Vector2* set_columns(Vector2* value) {
+		auto temp = get();
+		memcpy(value, temp.columns, 3);
+		set(temp);
+		return temp.columns;
+	}
+	GODOT_PROPERTY_WRAPPED_PROPERTY_NO_GET_SET(Vector2*, columns, Self);
 
 	Vector2 get_x() const { return get_columns()[0]; }
 	Vector2 get_y() const { return get_columns()[1]; }
@@ -275,13 +282,13 @@ public:
 		auto temp = get_columns();
 		temp[0] = value;
 		set_columns(temp);
-		return temp;
+		return temp[0];
 	}
 	Vector2 set_y(Vector2 value) {
 		auto temp = get_columns();
 		temp[1] = value;
 		set_columns(temp);
-		return temp;
+		return temp[1];
 	}
 
 	GODOT_PROPERTY_WRAPPED_PROPERTY_NO_GET_SET(Vector2, x, Self)

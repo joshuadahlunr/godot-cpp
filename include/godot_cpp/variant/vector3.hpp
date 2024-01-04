@@ -538,14 +538,6 @@ public:
 	GODOT_PROPERTY_WRAPPED_PROPERTY(real_t, y, Self)
 	GODOT_PROPERTY_WRAPPED_PROPERTY(real_t, z, Self)
 
-	// real_t get_x() const requires getable<Self> { return get().x; }
-	// real_t set_x(real_t value) requires getsetable<Self> { auto temp = get(); temp.x = value; set(temp); return temp.x; }
-	// Property<real_t, &Self::get_x, &Self::set_x> x() requires getsetable<Self> { return this; }
-	// Property<real_t, &Self::get_x> x() requires (!getsetable<Self> && getable<Self>) { return this; }
-	// Property<real_t, nullptr, &Self::set_x> x() requires (!getsetable<Self> && setable<Self>) { return this; }
-	// const Property<real_t, &Self::get_x, &Self::set_x> x() const requires getsetable<Self> { return this; }
-	// const Property<real_t, &Self::get_x> x() const requires (!getsetable<Self> && getable<Self>) { return this; }
-
 	GODOT_PROPERTY_WRAPPED_FUNCTION(min_axis_index, Self)
 	GODOT_PROPERTY_WRAPPED_FUNCTION(max_axis_index, Self)
 	GODOT_PROPERTY_WRAPPED_FUNCTION(length, Self)
